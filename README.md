@@ -25,6 +25,11 @@ python -m sandbox.load_generator --tps 10 --duration 60
 
 # 7. View incidents
 curl http://localhost:8000/incidents
+
+# 8. Run the dashboard (terminal 3)
+cd dashboard && npm install
+cp .env.local.example .env.local
+npm run dev   # http://localhost:3000
 ```
 
 ## Sandbox app endpoints
@@ -52,9 +57,17 @@ diagnostics finish (see `core/services/notifier.py`). Without it, notification i
 postmortem via Claude Sonnet from the stored trigger + diagnostics (`core/services/postmortem.py`).
 Fetch it back via `GET /incidents/{id}` (`postmortem` field).
 
+## Dashboard
+
+Next.js app in `dashboard/` — incident feed at `/`, drilldown at `/incidents/[id]`
+with suspect-commit diffs (fetched live from git via `GET /incidents/{id}/commits/{hash}/diff`)
+and an editable postmortem workspace (`PATCH /incidents/{id}/postmortem`). Polls the
+core API every 3s; no websockets in the MVP. Requires `core.main` running with
+`NEXT_PUBLIC_API_URL` pointed at it (defaults to `http://localhost:8000`).
+
 ## Phase Progress
 
 - [x] Phase 1: Simulation & Core Orchestrator
 - [x] Phase 2: Context Extraction & LLM Layer
 - [x] Phase 3: Integration & Slack Briefing
-- [ ] Phase 4: Next.js Incident Dashboard
+- [x] Phase 4: Next.js Incident Dashboard
