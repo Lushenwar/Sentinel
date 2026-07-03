@@ -16,23 +16,23 @@ def handle_alert(alert_data: dict) -> dict:
         "postmortem_draft_url": None,
     }
     db.save_incident(incident)
-    print(f"[orchestrator] {incident['incident_id']} created → triggered")
+    print(f"[orchestrator] {incident['incident_id']} created -> triggered")
     return incident
 
 def run_diagnostics(incident_id: str, alert_data: dict):
     """Runs in a background task after the alert response is sent."""
-    print(f"[orchestrator] {incident_id} → triaging")
+    print(f"[orchestrator] {incident_id} -> triaging")
     db.update_status(incident_id, "triaging")
 
     try:
         diffs = git_client.get_recent_diffs(REPO_PATH, alert_data["timestamp"])
-        print(f"[orchestrator] {incident_id} — {len(diffs)} commits in window")
+        print(f"[orchestrator] {incident_id} -- {len(diffs)} commits in window")
 
         ranked = llm_analyzer.rank_suspect_commits(diffs, alert_data) if diffs else []
-        print(f"[orchestrator] {incident_id} — LLM ranked {len(ranked)} suspects")
+        print(f"[orchestrator] {incident_id} -- LLM ranked {len(ranked)} suspects")
 
         runbooks = vector_store.find_matching_runbooks(alert_data.get("error_signature", ""))
-        print(f"[orchestrator] {incident_id} — {len(runbooks)} runbooks matched")
+        print(f"[orchestrator] {incident_id} -- {len(runbooks)} runbooks matched")
 
         diagnostics = {
             "suspect_commits": ranked,
@@ -43,7 +43,7 @@ def run_diagnostics(incident_id: str, alert_data: dict):
             },
         }
         db.update_diagnostics(incident_id, diagnostics)
-        print(f"[orchestrator] {incident_id} → diagnostics saved")
+        print(f"[orchestrator] {incident_id} -> diagnostics saved")
 
         try:
             notifier.post_incident_to_slack(db.get_incident(incident_id))
@@ -59,5 +59,5 @@ def resolve_incident(incident_id: str) -> dict:
     incident = db.get_incident(incident_id)
     draft = postmortem.generate_postmortem(incident)
     db.update_postmortem(incident_id, draft)
-    print(f"[orchestrator] {incident_id} → resolved, postmortem generated")
+    print(f"[orchestrator] {incident_id} -> resolved, postmortem generated")
     return db.get_incident(incident_id)

@@ -40,13 +40,13 @@ async def run(tps: int, duration: int):
                 }
                 try:
                     await client.post(CORE, json=alert, timeout=5.0)
-                    print(f"\n[load] alert fired → sentinel core")
+                    print(f"\n[load] alert fired -> sentinel core")
                 except Exception as e:
                     print(f"\n[load] core unreachable: {e}")
 
             await asyncio.sleep(max(0.0, interval - (time.monotonic() - t0)))
 
-    print(f"\n[load] done — ok={counts['ok']} err={counts['err']}")
+    print(f"\n[load] done -- ok={counts['ok']} err={counts['err']}")
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
