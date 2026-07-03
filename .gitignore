@@ -5,3 +5,6 @@ __pycache__/
 node_modules/
 *.egg-info/
 .chroma/
+.env.local
+.next/
+dashboard/next-env.d.ts

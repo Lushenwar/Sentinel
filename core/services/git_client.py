@@ -36,3 +36,11 @@ def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) ->
         })
 
     return commits
+
+def get_commit_diff(repo_path: str, commit_hash: str) -> str:
+    """Full untruncated diff for a single commit, for dashboard display."""
+    result = subprocess.run(
+        ["git", "show", "--stat", "--patch", commit_hash],
+        cwd=repo_path, capture_output=True, text=True,
+    )
+    return result.stdout if result.returncode == 0 else ""

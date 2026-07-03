@@ -1,0 +1,100 @@
+:root {
+  --bg: #0b0d10;
+  --panel: #14171c;
+  --border: #262b33;
+  --text: #e6e9ef;
+  --muted: #8b93a1;
+  --red: #ef5350;
+  --green: #66bb6a;
+  --amber: #ffb74d;
+  --blue: #64b5f6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 14px;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+main { padding: 24px; max-width: 960px; margin: 0 auto; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 11px; }
+tr:hover td { background: var(--panel); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.badge-triggered { background: #3a2e1a; color: var(--amber); }
+.badge-triaging { background: #1a2e3a; color: var(--blue); }
+.badge-resolving { background: #1a2e3a; color: var(--blue); }
+.badge-resolved { background: #1a3a20; color: var(--green); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.panel h2 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase; color: var(--muted); }
+
+button {
+  background: var(--blue);
+  color: #0b0d10;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+textarea {
+  width: 100%;
+  min-height: 260px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.diff-line { white-space: pre; font-family: inherit; padding: 0 8px; }
+.diff-add { background: rgba(102, 187, 106, 0.15); color: var(--green); }
+.diff-del { background: rgba(239, 83, 80, 0.15); color: var(--red); }
+.diff-meta { color: var(--muted); }
+
+.error-sig {
+  font-family: inherit;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  overflow-x: auto;
+  color: var(--red);
+}
