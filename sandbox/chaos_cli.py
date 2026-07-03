@@ -55,9 +55,17 @@ def trigger_bug(bug_type: str):
         click.echo(f"[chaos] core unreachable ({e}) — alert not forwarded")
 
 @cli.command("resolve-bug")
-def resolve_bug():
+@click.option("--incident", "incident_id", default=None, help="Incident ID to resolve + generate postmortem for")
+def resolve_bug(incident_id: str | None):
     _write_config_and_commit(None)
     click.echo("[chaos] bug resolved")
+
+    if incident_id:
+        try:
+            r = httpx.post(f"http://localhost:8000/incidents/{incident_id}/resolve", timeout=5.0)
+            click.echo(f"[chaos] postmortem requested for {incident_id} (status={r.json()['status']})")
+        except Exception as e:
+            click.echo(f"[chaos] core unreachable ({e}) — resolve not forwarded")
 
 @cli.command("status")
 def status():

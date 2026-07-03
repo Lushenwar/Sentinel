@@ -39,13 +39,22 @@ curl http://localhost:8000/incidents
 
 ```bash
 python -m sandbox.chaos_cli trigger-bug [--type db_failure|memory_leak|null_pointer]
-python -m sandbox.chaos_cli resolve-bug
+python -m sandbox.chaos_cli resolve-bug [--incident inc_...]   # generates postmortem when --incident given
 python -m sandbox.chaos_cli status
 ```
+
+## Slack briefing & postmortems
+
+Set `SLACK_WEBHOOK_URL` in `.env` to get a diagnostic card posted automatically once
+diagnostics finish (see `core/services/notifier.py`). Without it, notification is skipped.
+
+`POST /incidents/{id}/resolve` marks an incident resolved and generates a markdown
+postmortem via Claude Sonnet from the stored trigger + diagnostics (`core/services/postmortem.py`).
+Fetch it back via `GET /incidents/{id}` (`postmortem` field).
 
 ## Phase Progress
 
 - [x] Phase 1: Simulation & Core Orchestrator
-- [ ] Phase 2: Context Extraction & LLM Layer
-- [ ] Phase 3: Integration & Slack Briefing
+- [x] Phase 2: Context Extraction & LLM Layer
+- [x] Phase 3: Integration & Slack Briefing
 - [ ] Phase 4: Next.js Incident Dashboard

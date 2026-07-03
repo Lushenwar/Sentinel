@@ -28,3 +28,11 @@ def get_incident(incident_id: str) -> dict:
     if not inc:
         raise HTTPException(404, "incident not found")
     return inc
+
+@app.post("/incidents/{incident_id}/resolve")
+def resolve_incident(incident_id: str, background_tasks: BackgroundTasks) -> dict:
+    inc = db.get_incident(incident_id)
+    if not inc:
+        raise HTTPException(404, "incident not found")
+    background_tasks.add_task(orchestrator.resolve_incident, incident_id)
+    return {**inc, "status": "resolving"}

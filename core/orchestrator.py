@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timezone
 from . import db
-from .services import git_client, llm_analyzer, vector_store
+from .services import git_client, llm_analyzer, vector_store, notifier, postmortem
 
 REPO_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Sentinel root
 RUNBOOKS_DIR = os.path.join(REPO_PATH, "sandbox", "runbooks")
@@ -45,6 +45,19 @@ def run_diagnostics(incident_id: str, alert_data: dict):
         db.update_diagnostics(incident_id, diagnostics)
         print(f"[orchestrator] {incident_id} → diagnostics saved")
 
+        try:
+            notifier.post_incident_to_slack(db.get_incident(incident_id))
+        except Exception as e:
+            print(f"[orchestrator] {incident_id} slack notify failed: {e}")
+
     except Exception as e:
         print(f"[orchestrator] {incident_id} diagnostics failed: {e}")
         db.update_status(incident_id, "triggered")  # revert so it can be retried
+
+def resolve_incident(incident_id: str) -> dict:
+    """Runs in a background task once an incident is marked resolved."""
+    incident = db.get_incident(incident_id)
+    draft = postmortem.generate_postmortem(incident)
+    db.update_postmortem(incident_id, draft)
+    print(f"[orchestrator] {incident_id} → resolved, postmortem generated")
+    return db.get_incident(incident_id)

@@ -92,3 +92,13 @@ def update_diagnostics(incident_id: str, diagnostics: dict):
                 (json.dumps(diagnostics), incident_id),
             )
     conn.close()
+
+def update_postmortem(incident_id: str, postmortem: str):
+    conn = _conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE incidents SET postmortem = %s, status = 'resolved', updated_at = NOW() WHERE id = %s",
+                (postmortem, incident_id),
+            )
+    conn.close()
