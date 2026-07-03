@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SentinelIncidentPayload",
+  "type": "object",
+  "required": ["incident_id", "status", "trigger"],
+  "properties": {
+    "incident_id": { "type": "string", "pattern": "^inc_" },
+    "status": { "type": "string", "enum": ["triggered", "triaging", "resolved"] },
+    "trigger": {
+      "type": "object",
+      "required": ["source", "alert_name", "timestamp", "error_signature"],
+      "properties": {
+        "source": { "type": "string" },
+        "alert_name": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "error_signature": { "type": "string" }
+      }
+    },
+    "diagnostics": {
+      "type": ["object", "null"],
+      "properties": {
+        "suspect_commits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "commit_hash": { "type": "string" },
+              "author": { "type": "string" },
+              "timestamp": { "type": "string" },
+              "rationale": { "type": "string" },
+              "confidence_score": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "matched_runbooks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "similarity_score": { "type": "number" },
+              "primary_action": { "type": "string" }
+            }
+          }
+        },
+        "impact_assessment": {
+          "type": "object",
+          "properties": {
+            "error_rate_delta_pct": { "type": "number" },
+            "estimated_affected_users": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "postmortem_draft_url": { "type": ["string", "null"] }
+  }
+}
