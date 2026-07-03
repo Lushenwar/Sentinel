@@ -1,4 +1,4 @@
-from .llm_analyzer import _client
+from .openrouter import chat
 
 def generate_postmortem(incident: dict) -> str:
     """incident is a db row: {id, status, trigger_data, diagnostics, ...}"""
@@ -18,9 +18,5 @@ def generate_postmortem(incident: dict) -> str:
         f"Base every claim strictly on the data given above — do not invent details."
     )
 
-    response = _client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return "".join(block.text for block in response.content if block.type == "text")
+    response = chat(messages=[{"role": "user", "content": prompt}], max_tokens=1024)
+    return response["choices"][0]["message"]["content"]

@@ -1,31 +1,30 @@
-import os
-import anthropic
-from dotenv import load_dotenv
-
-load_dotenv()
-_client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+import json
+from .openrouter import chat
 
 _RANK_TOOL = {
-    "name": "rank_commits",
-    "description": "Rank commits by likelihood of causing the incident. Include ALL commits, scored 0-1.",
-    "input_schema": {
-        "type": "object",
-        "required": ["ranked_commits"],
-        "properties": {
-            "ranked_commits": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "required": ["commit_hash", "author", "timestamp", "rationale", "confidence_score"],
-                    "properties": {
-                        "commit_hash":      {"type": "string"},
-                        "author":           {"type": "string"},
-                        "timestamp":        {"type": "string"},
-                        "rationale":        {"type": "string"},
-                        "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "type": "function",
+    "function": {
+        "name": "rank_commits",
+        "description": "Rank commits by likelihood of causing the incident. Include ALL commits, scored 0-1.",
+        "parameters": {
+            "type": "object",
+            "required": ["ranked_commits"],
+            "properties": {
+                "ranked_commits": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["commit_hash", "author", "timestamp", "rationale", "confidence_score"],
+                        "properties": {
+                            "commit_hash":      {"type": "string"},
+                            "author":           {"type": "string"},
+                            "timestamp":        {"type": "string"},
+                            "rationale":        {"type": "string"},
+                            "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+                        },
                     },
-                },
-            }
+                }
+            },
         },
     },
 }
@@ -52,17 +51,17 @@ def rank_suspect_commits(diffs: list[dict], alert: dict) -> list[dict]:
         f"and a one-sentence rationale."
     )
 
-    response = _client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
-        tools=[_RANK_TOOL],
-        tool_choice={"type": "tool", "name": "rank_commits"},
+    response = chat(
         messages=[{"role": "user", "content": prompt}],
+        tools=[_RANK_TOOL],
+        tool_choice={"type": "function", "function": {"name": "rank_commits"}},
+        max_tokens=1024,
     )
 
-    for block in response.content:
-        if block.type == "tool_use" and block.name == "rank_commits":
-            ranked = block.input["ranked_commits"]
+    message = response["choices"][0]["message"]
+    for call in message.get("tool_calls") or []:
+        if call["function"]["name"] == "rank_commits":
+            ranked = json.loads(call["function"]["arguments"])["ranked_commits"]
             return sorted(ranked, key=lambda c: c["confidence_score"], reverse=True)
 
     return []

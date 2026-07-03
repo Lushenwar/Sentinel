@@ -1,5 +1,5 @@
-# ponytail: mocks anthropic client so test runs without a live API key
-from unittest.mock import patch, MagicMock
+# ponytail: mocks openrouter.chat so test runs without a live API key
+from unittest.mock import patch
 from core.services.llm_analyzer import rank_suspect_commits
 
 _DIFFS = [
@@ -20,22 +20,25 @@ _ALERT = {
 def test_rank_returns_empty_for_no_diffs():
     assert rank_suspect_commits([], _ALERT) == []
 
-def test_rank_calls_anthropic_and_returns_sorted():
-    fake_block = MagicMock()
-    fake_block.type = "tool_use"
-    fake_block.name = "rank_commits"
-    fake_block.input = {
-        "ranked_commits": [
-            {"commit_hash": "a1b2c3d", "author": "dev@co.com",
-             "timestamp": "2026-07-03T11:25:00Z",
-             "rationale": "Directly set db_failure bug.", "confidence_score": 0.95}
-        ]
+def test_rank_calls_openrouter_and_returns_sorted():
+    fake_response = {
+        "choices": [{
+            "message": {
+                "tool_calls": [{
+                    "function": {
+                        "name": "rank_commits",
+                        "arguments": (
+                            '{"ranked_commits": [{"commit_hash": "a1b2c3d", '
+                            '"author": "dev@co.com", "timestamp": "2026-07-03T11:25:00Z", '
+                            '"rationale": "Directly set db_failure bug.", "confidence_score": 0.95}]}'
+                        ),
+                    },
+                }],
+            },
+        }],
     }
-    fake_response = MagicMock()
-    fake_response.content = [fake_block]
 
-    with patch("core.services.llm_analyzer._client") as mock_client:
-        mock_client.messages.create.return_value = fake_response
+    with patch("core.services.llm_analyzer.chat", return_value=fake_response):
         result = rank_suspect_commits(_DIFFS, _ALERT)
 
     assert len(result) == 1
@@ -43,5 +46,5 @@ def test_rank_calls_anthropic_and_returns_sorted():
 
 if __name__ == "__main__":
     test_rank_returns_empty_for_no_diffs()
-    test_rank_calls_anthropic_and_returns_sorted()
+    test_rank_calls_openrouter_and_returns_sorted()
     print("✓ llm_logic tests passed")
