@@ -41,10 +41,10 @@ def test_post_incident_to_slack_posts_when_configured():
         mock_post.assert_called_once()
 
 def test_generate_postmortem_returns_llm_text():
-    fake_block = MagicMock(type="text", text="## Summary\nDB pool misconfigured.")
-    fake_response = MagicMock(content=[fake_block])
-    with patch("core.services.postmortem._client") as mock_client:
-        mock_client.messages.create.return_value = fake_response
+    fake_response = {
+        "choices": [{"message": {"content": "## Summary\nDB pool misconfigured."}}],
+    }
+    with patch("core.services.postmortem.chat", return_value=fake_response):
         result = generate_postmortem(_INCIDENT)
     assert "Summary" in result
 
