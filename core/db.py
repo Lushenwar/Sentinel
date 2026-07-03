@@ -72,3 +72,23 @@ def list_incidents() -> list:
         rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+def update_status(incident_id: str, status: str):
+    conn = _conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE incidents SET status = %s, updated_at = NOW() WHERE id = %s",
+                (status, incident_id),
+            )
+    conn.close()
+
+def update_diagnostics(incident_id: str, diagnostics: dict):
+    conn = _conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE incidents SET diagnostics = %s, status = 'triaging', updated_at = NOW() WHERE id = %s",
+                (json.dumps(diagnostics), incident_id),
+            )
+    conn.close()
