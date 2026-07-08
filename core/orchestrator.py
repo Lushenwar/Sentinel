@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime, timezone
 from . import db
 from .services import git_client, llm_analyzer, vector_store, notifier, postmortem
@@ -43,7 +44,10 @@ def run_diagnostics(incident_id: str, alert_data: dict):
             },
         }
         db.update_diagnostics(incident_id, diagnostics)
+        alert_dt = datetime.fromisoformat(alert_data["timestamp"].replace("Z", "+00:00"))
+        elapsed = (datetime.now(timezone.utc) - alert_dt).total_seconds()
         print(f"[orchestrator] {incident_id} -> diagnostics saved")
+        print(f"[metrics] {incident_id} alert_to_suspects_s={elapsed:.1f}")
 
         try:
             notifier.post_incident_to_slack(db.get_incident(incident_id))
@@ -56,8 +60,10 @@ def run_diagnostics(incident_id: str, alert_data: dict):
 
 def resolve_incident(incident_id: str) -> dict:
     """Runs in a background task once an incident is marked resolved."""
+    t0 = time.monotonic()
     incident = db.get_incident(incident_id)
     draft = postmortem.generate_postmortem(incident)
     db.update_postmortem(incident_id, draft)
     print(f"[orchestrator] {incident_id} -> resolved, postmortem generated")
+    print(f"[metrics] {incident_id} resolve_to_postmortem_s={time.monotonic() - t0:.1f}")
     return db.get_incident(incident_id)

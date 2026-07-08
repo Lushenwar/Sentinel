@@ -10,7 +10,7 @@ def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) ->
 
     log = subprocess.run(
         ["git", "log", "--format=%H|%ae|%aI|%s", f"--since={since}", f"--until={until}"],
-        cwd=repo_path, capture_output=True, text=True,
+        cwd=repo_path, capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if log.returncode != 0 or not log.stdout.strip():
         return []
@@ -24,7 +24,7 @@ def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) ->
 
         diff = subprocess.run(
             ["git", "show", "--stat", "--patch", full_hash],
-            cwd=repo_path, capture_output=True, text=True,
+            cwd=repo_path, capture_output=True, text=True, encoding="utf-8", errors="replace",
         )
         commits.append({
             "commit_hash": full_hash[:7],
@@ -41,6 +41,6 @@ def get_commit_diff(repo_path: str, commit_hash: str) -> str:
     """Full untruncated diff for a single commit, for dashboard display."""
     result = subprocess.run(
         ["git", "show", "--stat", "--patch", commit_hash],
-        cwd=repo_path, capture_output=True, text=True,
+        cwd=repo_path, capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     return result.stdout if result.returncode == 0 else ""
