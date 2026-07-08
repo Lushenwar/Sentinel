@@ -1,38 +1,90 @@
 # Sentinel
 
-Automated incident triage engine — intercepts alerts, correlates git history, briefs engineers, drafts postmortems.
+<!-- DEMO GIF: record per docs/demo-script.md and replace this comment with:
+![Sentinel demo](docs/demo.gif) -->
 
-## Quick Start
+**Automated incident triage: from alert to ranked root-cause commit in ~13 seconds, postmortem drafted in ~14 (measured — see [METRICS.md](METRICS.md)).**
+
+Sentinel intercepts an operational alert, pulls the git diffs around the alert
+window, has Claude rank the suspect commits with structured JSON output, matches
+the failure signature to runbooks by vector similarity, briefs the team in
+Slack, and drafts the postmortem on resolution.
+
+## Quickstart
 
 ```bash
-# 1. Install core deps
-pip install -e core/
+git clone https://github.com/Lushenwar/Sentinel.git && cd Sentinel
+cp .env.example .env        # set OPENROUTER_API_KEY (and optionally SLACK_WEBHOOK_URL)
+docker-compose up           # dashboard :3000, core API :8000, sandbox app :8001, Postgres :5432
 
-# 2. Configure environment
-cp .env.example .env   # fill in DATABASE_URL
-
-# 3. Run core engine (terminal 1)
-uvicorn core.main:app --port 8000 --reload
-
-# 4. Run sandbox toy app (terminal 2)
-uvicorn sandbox.app.main:app --port 8001 --reload
-
-# 5. Trigger an incident
-python -m sandbox.chaos_cli trigger-bug --type db_failure
-
-# 6. Run load generator (optional — auto-fires alert on error rate spike)
-python -m sandbox.load_generator --tps 10 --duration 60
-
-# 7. View incidents
-curl http://localhost:8000/incidents
-
-# 8. Run the dashboard (terminal 3)
-cd dashboard && npm install
-cp .env.local.example .env.local
-npm run dev   # http://localhost:3000
+# trigger an incident (in another terminal)
+docker-compose exec core python -m sandbox.chaos_cli trigger-bug --type db_failure
+# watch it triage at http://localhost:3000, then resolve it:
+docker-compose exec core python -m sandbox.chaos_cli resolve-bug --incident <incident_id>
 ```
 
-## Sandbox app endpoints
+<details>
+<summary>Running without Docker</summary>
+
+```bash
+pip install -e core/
+cp .env.example .env                        # fill in DATABASE_URL, OPENROUTER_API_KEY
+uvicorn core.main:app --port 8000           # terminal 1: core engine
+uvicorn sandbox.app.main:app --port 8001    # terminal 2: sandbox toy app
+python -m sandbox.chaos_cli trigger-bug --type db_failure
+python -m sandbox.load_generator --tps 10 --duration 60   # optional: auto-fires alert on error spike
+cd dashboard && npm install && cp .env.local.example .env.local && npm run dev   # terminal 3
+```
+</details>
+
+## Architecture
+
+```
+                      ┌────────────────────────────────────────┐
+                      │        Next.js Frontend Client         │
+                      │   (Timeline, Diff Viewer, Postmortems) │
+                      └───────────────────▲────────────────────┘
+                                          │  REST (3s polling)
+┌───────────────────────┐     ┌───────────▼────────────┐     ┌───────────────────────┐
+│  Simulation Sandbox   │     │   Sentinel Core App    │     │ External Integrations │
+│ (Toy Repo, Fake load, │────>│    (FastAPI / State    │────>│ (Slack Webhooks,      │
+│  Mock Alert Engine)   │     │  Machine Orchestrator) │     │  Claude Sonnet API)   │
+└───────────────────────┘     └───────────▲────────────┘     └───────────────────────┘
+                                          │
+                                          ▼
+                              ┌───────────────────────┐
+                              │  PostgreSQL + Chroma  │
+                              │ (Timelines & Vector   │
+                              │   Runbook Storage)    │
+                              └───────────────────────┘
+```
+
+## How it works
+
+1. **Trigger** — `sandbox/chaos_cli.py` commits a real faulty change to the repo
+   and fires a mock-Sentry alert at `POST /alert` (or the load generator detects
+   the error-rate spike and fires it for you).
+2. **Diagnose** — the orchestrator slices the git history around the alert
+   timestamp (`git_client`), sends the diffs to Claude through a strict
+   tool-call schema that forces ranked, confidence-scored JSON
+   (`llm_analyzer`), and matches the error signature against runbook embeddings
+   in Chroma (`vector_store`).
+3. **Communicate** — a Slack Block Kit diagnostic card posts to your channel:
+   top suspect commit, confidence, rationale, matched runbook action
+   (`notifier`).
+4. **Document** — on `POST /incidents/{id}/resolve`, Claude drafts a structured
+   markdown postmortem from the stored timeline, editable in the dashboard
+   workspace (`postmortem`).
+
+Every hop reads and writes one auditable incident row conforming to
+[`contract/pipeline_schema.json`](contract/pipeline_schema.json).
+
+## Docs
+
+- [METRICS.md](METRICS.md) — measured end-to-end timings, methodology, and per-run results
+- [ADR.md](ADR.md) — why explicit state loops over LangChain, polling over WebSockets, Chroma over Pinecone, FastAPI over Flask, tool-call JSON over free-form parsing, sandbox over live infra
+
+## Sandbox reference
 
 | Endpoint | Description |
 |---|---|
@@ -40,34 +92,8 @@ npm run dev   # http://localhost:3000
 | `GET /api/data` | Returns data; fails with db_failure bug |
 | `POST /api/process` | Processes body; fails with null_pointer bug |
 
-## Chaos CLI
-
 ```bash
 python -m sandbox.chaos_cli trigger-bug [--type db_failure|memory_leak|null_pointer]
 python -m sandbox.chaos_cli resolve-bug [--incident inc_...]   # generates postmortem when --incident given
 python -m sandbox.chaos_cli status
 ```
-
-## Slack briefing & postmortems
-
-Set `SLACK_WEBHOOK_URL` in `.env` to get a diagnostic card posted automatically once
-diagnostics finish (see `core/services/notifier.py`). Without it, notification is skipped.
-
-`POST /incidents/{id}/resolve` marks an incident resolved and generates a markdown
-postmortem via Claude Sonnet from the stored trigger + diagnostics (`core/services/postmortem.py`).
-Fetch it back via `GET /incidents/{id}` (`postmortem` field).
-
-## Dashboard
-
-Next.js app in `dashboard/` — incident feed at `/`, drilldown at `/incidents/[id]`
-with suspect-commit diffs (fetched live from git via `GET /incidents/{id}/commits/{hash}/diff`)
-and an editable postmortem workspace (`PATCH /incidents/{id}/postmortem`). Polls the
-core API every 3s; no websockets in the MVP. Requires `core.main` running with
-`NEXT_PUBLIC_API_URL` pointed at it (defaults to `http://localhost:8000`).
-
-## Phase Progress
-
-- [x] Phase 1: Simulation & Core Orchestrator
-- [x] Phase 2: Context Extraction & LLM Layer
-- [x] Phase 3: Integration & Slack Briefing
-- [x] Phase 4: Next.js Incident Dashboard

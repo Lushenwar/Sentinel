@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sentinel}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-sentinel}@postgres:5432/postgres
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    command: uvicorn sandbox.app.main:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - core
+
+  dashboard:
+    build:
+      context: dashboard
+    environment:
+      # read by the browser, so it must point at the host-published core port
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - core
+
+volumes:
+  pgdata:
