@@ -34,6 +34,8 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: dashboard/package-lock.json
-      - run: npm ci
+      # ponytail: npm install, not npm ci — Windows-generated lockfiles omit optional
+      # wasm-binding deps (@emnapi/*) that Linux npm ci then rejects
+      - run: npm install --no-audit --no-fund
       - run: npm run lint
       - run: npm test
