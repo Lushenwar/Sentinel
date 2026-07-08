@@ -1,4 +1,5 @@
-import os, json
+import json
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -6,9 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 DSN = os.environ["DATABASE_URL"]
 
+
 # ponytail: new connection per call; add psycopg2.pool.ThreadedConnectionPool if throughput matters
 def _conn():
     return psycopg2.connect(DSN)
+
 
 def init_schema():
     conn = _conn()
@@ -36,6 +39,7 @@ def init_schema():
             """)
     conn.close()
 
+
 def save_incident(incident: dict):
     conn = _conn()
     with conn:
@@ -57,6 +61,7 @@ def save_incident(incident: dict):
             )
     conn.close()
 
+
 def get_incident(incident_id: str) -> dict | None:
     conn = _conn()
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -65,6 +70,7 @@ def get_incident(incident_id: str) -> dict | None:
     conn.close()
     return dict(row) if row else None
 
+
 def list_incidents() -> list:
     conn = _conn()
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -72,6 +78,7 @@ def list_incidents() -> list:
         rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
 
 def update_status(incident_id: str, status: str):
     conn = _conn()
@@ -83,15 +90,18 @@ def update_status(incident_id: str, status: str):
             )
     conn.close()
 
+
 def update_diagnostics(incident_id: str, diagnostics: dict):
     conn = _conn()
     with conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE incidents SET diagnostics = %s, status = 'triaging', updated_at = NOW() WHERE id = %s",
+                "UPDATE incidents SET diagnostics = %s, status = 'triaging', updated_at = NOW() "
+                "WHERE id = %s",
                 (json.dumps(diagnostics), incident_id),
             )
     conn.close()
+
 
 def update_postmortem(incident_id: str, postmortem: str):
     conn = _conn()

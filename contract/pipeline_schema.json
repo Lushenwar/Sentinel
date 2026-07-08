@@ -5,7 +5,7 @@
   "required": ["incident_id", "status", "trigger"],
   "properties": {
     "incident_id": { "type": "string", "pattern": "^inc_" },
-    "status": { "type": "string", "enum": ["triggered", "triaging", "resolved"] },
+    "status": { "type": "string", "enum": ["triggered", "triaging", "degraded", "resolved"] },
     "trigger": {
       "type": "object",
       "required": ["source", "alert_name", "timestamp", "error_signature"],
@@ -47,8 +47,23 @@
         "impact_assessment": {
           "type": "object",
           "properties": {
-            "error_rate_delta_pct": { "type": "number" },
-            "estimated_affected_users": { "type": "integer" }
+            "error_rate_delta_pct": { "type": ["number", "null"] },
+            "estimated_affected_users": { "type": ["integer", "null"] }
+          }
+        },
+        "degraded": { "type": "boolean" },
+        "degraded_reason": { "type": "string" },
+        "raw_commits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "commit_hash": { "type": "string" },
+              "author": { "type": "string" },
+              "timestamp": { "type": "string" },
+              "subject": { "type": "string" },
+              "diff": { "type": "string" }
+            }
           }
         }
       }

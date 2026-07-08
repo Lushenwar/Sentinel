@@ -22,6 +22,7 @@ _INCIDENT = {
     },
 }
 
+
 def test_build_incident_card_includes_error_and_top_suspect():
     card = build_incident_card(_INCIDENT)
     text = str(card)
@@ -29,16 +30,20 @@ def test_build_incident_card_includes_error_and_top_suspect():
     assert "a1b2c3d" in text
     assert "Database Connection Pool Exhaustion" in text
 
+
 def test_post_incident_to_slack_skips_without_webhook_url():
     with patch("core.services.notifier.SLACK_WEBHOOK_URL", None):
         assert post_incident_to_slack(_INCIDENT) is False
 
+
 def test_post_incident_to_slack_posts_when_configured():
-    with patch("core.services.notifier.SLACK_WEBHOOK_URL", "https://hooks.slack.com/x"), \
-         patch("core.services.notifier.httpx.post") as mock_post:
+    with patch("core.services.notifier.SLACK_WEBHOOK_URL", "https://hooks.slack.com/x"), patch(
+        "core.services.notifier.httpx.post"
+    ) as mock_post:
         mock_post.return_value = MagicMock(raise_for_status=lambda: None)
         assert post_incident_to_slack(_INCIDENT) is True
         mock_post.assert_called_once()
+
 
 def test_generate_postmortem_returns_llm_text():
     fake_response = {
@@ -47,6 +52,7 @@ def test_generate_postmortem_returns_llm_text():
     with patch("core.services.postmortem.chat", return_value=fake_response):
         result = generate_postmortem(_INCIDENT)
     assert "Summary" in result
+
 
 if __name__ == "__main__":
     test_build_incident_card_includes_error_and_top_suspect()
