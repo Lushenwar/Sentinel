@@ -4,8 +4,8 @@
 
 ```
 ╔══════════════════════════════════════════════════════════╗
-║  HARDENING PROGRESS                             1/4 DONE ║
-║  ██████░░░░░░░░░░░░░░░░░░  PHASE 5 VERIFIED               ║
+║  HARDENING PROGRESS                           1.5/4 DONE ║
+║  █████████░░░░░░░░░░░░░░░  PHASE 6 AUTHORED               ║
 ║  Phase 5: Live Verification & Real Metrics  [x]  (P0)    ║
 ║  Phase 6: Presentation Layer                [ ]  (P1)    ║
 ║  Phase 7: Resilience & Test Hardening       [ ]  (P2)    ║
@@ -150,13 +150,13 @@ the README, and leave. This phase is where the whole build pays off.
 system working above the fold, and every major architectural decision is written
 down and defensible aloud.
 
-* **Step 6A — Record the demo and embed a GIF.** `[ ]`
+* **Step 6A — Record the demo and embed a GIF.** `[ ]` *(script + README slot ready in `docs/demo-script.md`; recording is a user action)*
   * Record a 60–90s screen capture. Beat sheet: `0:00` healthy state / traffic → `0:15` trigger chaos script → `0:30` alert fires + dashboard updates → `0:55` faulty commit surfaced + Slack post → `1:20` postmortem generated.
   * Convert to GIF (or upload video and link a thumbnail). Embed at the very top of the README, above the fold.
   * *Verify:* GIF autoplays on GitHub (keep it under ~10MB) and communicates the full loop without audio.
   * *Gotcha:* The diff viewer and Slack card are the two most impressive on-screen moments — make sure both are clearly visible in frame.
 
-* **Step 6B — Author docker-compose.yml.** `[ ]`
+* **Step 6B — Author docker-compose.yml.** `[ ]` *(compose + Dockerfiles authored; clean-clone verify pending — Docker not installed on this machine)*
   * Bring up four services: Next.js dashboard, FastAPI core, Postgres, load generator / sandbox.
   * Use `depends_on` + a healthcheck on Postgres so the core waits for the DB.
   * Pull all secrets from env vars / an `.env` file referenced by the compose, never inline.
@@ -164,12 +164,12 @@ down and defensible aloud.
   * *Verify:* `git clone` into a fresh directory → set env → `docker-compose up` → dashboard reachable and a triggered incident flows end-to-end.
   * *Gotcha:* This step doubles as a second reproduction of Phase 5. If it does not work in a clean container, you have an undocumented local dependency — find it now.
 
-* **Step 6C — Write ADR.md.** `[ ]`
+* **Step 6C — Write ADR.md.** `[x]`
   * Format each record: Context → Decision → Consequences / trade-offs.
   * Cover at minimum: (1) no LangChain/CrewAI — explicit state loops; (2) polling/SSE over WebSockets for the MVP; (3) Chroma/pgvector over a hosted vector DB (Pinecone); (4) FastAPI over Flask; (5) structured JSON via Claude tool calls over free-form parsing; (6) simulated sandbox over live infra.
   * *Verify:* You can read each record aloud as a complete answer to "why did you choose X over Y?"
 
-* **Step 6D — README structure pass.** `[ ]`
+* **Step 6D — README structure pass.** `[x]`
   * Order: demo GIF → one-line pitch → quickstart (`docker-compose up`) → architecture diagram (reuse the base CLAUDE.md ASCII) → how-it-works (Trigger → Diagnose → Communicate → Document) → link to ADR.md and METRICS.md.
   * *Verify:* A reviewer scrolling for 30 seconds understands what it is, sees it run, and knows how to run it.
 

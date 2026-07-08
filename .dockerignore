@@ -1,0 +1,5 @@
+dashboard/node_modules
+**/__pycache__
+.chroma
+.env
+*.egg-info

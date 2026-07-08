@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+# git is required: core/services/git_client.py shells out to git for diff windows
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/* \
+    && git config --system safe.directory '*' \
+    && git config --system user.email "chaos@sentinel.local" \
+    && git config --system user.name "sentinel-chaos"
+
+WORKDIR /app
+COPY . .
+RUN pip install --no-cache-dir -e core/ click
+
+EXPOSE 8000
+CMD ["uvicorn", "core.main:app", "--host", "0.0.0.0", "--port", "8000"]
