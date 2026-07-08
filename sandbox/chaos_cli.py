@@ -4,7 +4,9 @@ Usage (from Sentinel/ root):
   python -m sandbox.chaos_cli resolve-bug
   python -m sandbox.chaos_cli status
 """
-import json, subprocess
+
+import json
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,6 +23,7 @@ _ERROR_SIGS = {
     "null_pointer": "'NoneType' object has no attribute 'encode'",
 }
 
+
 def _write_config_and_commit(bug: str | None):
     cfg = json.loads(CONFIG.read_text())
     cfg["bug"] = bug
@@ -29,13 +32,16 @@ def _write_config_and_commit(bug: str | None):
     subprocess.run(["git", "add", str(CONFIG)], cwd=REPO_ROOT, check=True)
     subprocess.run(["git", "commit", "-m", msg], cwd=REPO_ROOT, check=True)
 
+
 @click.group()
 def cli():
     pass
 
+
 @cli.command("trigger-bug")
-@click.option("--type", "bug_type", default="db_failure",
-              type=click.Choice(list(_ERROR_SIGS)), show_default=True)
+@click.option(
+    "--type", "bug_type", default="db_failure", type=click.Choice(list(_ERROR_SIGS)), show_default=True
+)
 def trigger_bug(bug_type: str):
     _write_config_and_commit(bug_type)
     click.echo(f"[chaos] injected: {bug_type}")
@@ -54,8 +60,11 @@ def trigger_bug(bug_type: str):
     except Exception as e:
         click.echo(f"[chaos] core unreachable ({e}) -- alert not forwarded")
 
+
 @cli.command("resolve-bug")
-@click.option("--incident", "incident_id", default=None, help="Incident ID to resolve + generate postmortem for")
+@click.option(
+    "--incident", "incident_id", default=None, help="Incident ID to resolve + generate postmortem for"
+)
 def resolve_bug(incident_id: str | None):
     _write_config_and_commit(None)
     click.echo("[chaos] bug resolved")
@@ -67,10 +76,12 @@ def resolve_bug(incident_id: str | None):
         except Exception as e:
             click.echo(f"[chaos] core unreachable ({e}) -- resolve not forwarded")
 
+
 @cli.command("status")
 def status():
     cfg = json.loads(CONFIG.read_text())
     click.echo(f"[chaos] active bug: {cfg.get('bug') or 'none'}")
+
 
 if __name__ == "__main__":
     cli()

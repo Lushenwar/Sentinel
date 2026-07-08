@@ -1,5 +1,7 @@
 # Sentinel
 
+![CI](https://github.com/Lushenwar/Sentinel/actions/workflows/ci.yml/badge.svg)
+
 <!-- DEMO GIF: record per docs/demo-script.md and replace this comment with:
 ![Sentinel demo](docs/demo.gif) -->
 

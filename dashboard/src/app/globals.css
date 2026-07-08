@@ -48,6 +48,7 @@ tr:hover td { background: var(--panel); }
 .badge-triaging { background: #1a2e3a; color: var(--blue); }
 .badge-resolving { background: #1a2e3a; color: var(--blue); }
 .badge-resolved { background: #1a3a20; color: var(--green); }
+.badge-degraded { background: #3a1a1a; color: var(--red, #e05555); }
 
 .panel {
   background: var(--panel);

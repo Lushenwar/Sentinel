@@ -2,13 +2,19 @@
 Usage: python -m sandbox.load_generator [--tps 5] [--duration 30]
 Drives traffic to the sandbox app; auto-fires an alert to core when error rate spikes.
 """
-import asyncio, httpx, time, argparse
+
+import argparse
+import asyncio
+import time
+
+import httpx
 from datetime import datetime, timezone
 
 APP = "http://localhost:8001"
 CORE = "http://localhost:8000/alert"
 ALERT_THRESHOLD_PCT = 20
 ALERT_MIN_ERRORS = 5
+
 
 async def run(tps: int, duration: int):
     counts = {"ok": 0, "err": 0}
@@ -40,13 +46,14 @@ async def run(tps: int, duration: int):
                 }
                 try:
                     await client.post(CORE, json=alert, timeout=5.0)
-                    print(f"\n[load] alert fired -> sentinel core")
+                    print("\n[load] alert fired -> sentinel core")
                 except Exception as e:
                     print(f"\n[load] core unreachable: {e}")
 
             await asyncio.sleep(max(0.0, interval - (time.monotonic() - t0)))
 
     print(f"\n[load] done -- ok={counts['ok']} err={counts['err']}")
+
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()

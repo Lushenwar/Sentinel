@@ -1,4 +1,7 @@
+import httpx
 from .openrouter import chat
+from .llm_analyzer import LLMUnavailable
+
 
 def generate_postmortem(incident: dict) -> str:
     """incident is a db row: {id, status, trigger_data, diagnostics, ...}"""
@@ -18,5 +21,13 @@ def generate_postmortem(incident: dict) -> str:
         f"Base every claim strictly on the data given above — do not invent details."
     )
 
-    response = chat(messages=[{"role": "user", "content": prompt}], max_tokens=1024)
-    return response["choices"][0]["message"]["content"]
+    try:
+        response = chat(messages=[{"role": "user", "content": prompt}], max_tokens=1024)
+        content = response["choices"][0]["message"]["content"]
+    except httpx.HTTPError as e:
+        raise LLMUnavailable(f"LLM request failed: {e}") from e
+    except (KeyError, IndexError, TypeError) as e:
+        raise LLMUnavailable(f"unexpected LLM response shape: {e}") from e
+    if not content:
+        raise LLMUnavailable("empty or refused response: no postmortem content returned")
+    return content

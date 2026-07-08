@@ -1,6 +1,6 @@
 import subprocess
-from datetime import datetime, timezone, timedelta
-from pathlib import Path
+from datetime import datetime, timedelta
+
 
 def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) -> list[dict]:
     """Return commits with diffs in [alert_ts - window_minutes, alert_ts]."""
@@ -10,7 +10,11 @@ def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) ->
 
     log = subprocess.run(
         ["git", "log", "--format=%H|%ae|%aI|%s", f"--since={since}", f"--until={until}"],
-        cwd=repo_path, capture_output=True, text=True, encoding="utf-8", errors="replace",
+        cwd=repo_path,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if log.returncode != 0 or not log.stdout.strip():
         return []
@@ -24,23 +28,34 @@ def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) ->
 
         diff = subprocess.run(
             ["git", "show", "--stat", "--patch", full_hash],
-            cwd=repo_path, capture_output=True, text=True, encoding="utf-8", errors="replace",
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
         )
-        commits.append({
-            "commit_hash": full_hash[:7],
-            "full_hash": full_hash,
-            "author": author,
-            "timestamp": ts,
-            "subject": subject,
-            "diff": diff.stdout[:3000],  # ponytail: truncated for LLM context; raise if diffs are large
-        })
+        commits.append(
+            {
+                "commit_hash": full_hash[:7],
+                "full_hash": full_hash,
+                "author": author,
+                "timestamp": ts,
+                "subject": subject,
+                "diff": diff.stdout[:3000],  # ponytail: truncated for LLM context; raise if diffs are large
+            }
+        )
 
     return commits
+
 
 def get_commit_diff(repo_path: str, commit_hash: str) -> str:
     """Full untruncated diff for a single commit, for dashboard display."""
     result = subprocess.run(
         ["git", "show", "--stat", "--patch", commit_hash],
-        cwd=repo_path, capture_output=True, text=True, encoding="utf-8", errors="replace",
+        cwd=repo_path,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     return result.stdout if result.returncode == 0 else ""

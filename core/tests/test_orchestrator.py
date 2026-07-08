@@ -9,6 +9,7 @@ _ALERT = {
     "error_signature": "OperationalError: connection refused",
 }
 
+
 def test_handle_alert():
     with patch("core.orchestrator.db.save_incident") as mock_save:
         result = handle_alert(_ALERT)
@@ -17,6 +18,7 @@ def test_handle_alert():
     assert result["trigger"] == _ALERT
     assert result["diagnostics"] is None
     mock_save.assert_called_once()
+
 
 if __name__ == "__main__":
     test_handle_alert()
