@@ -49,8 +49,7 @@ def test_dedup_folds_repeat_alerts():
 def test_dedup_threshold_suppresses_below_burst():
     """With a threshold >1, alerts below the burst count are suppressed, not opened."""
     _reset_dedup()
-    with patch.object(orch, "_DEDUP_THRESHOLD", 3), \
-         patch("core.orchestrator.db.save_incident") as mock_save:
+    with patch.object(orch, "_DEDUP_THRESHOLD", 3), patch("core.orchestrator.db.save_incident") as mock_save:
         r1 = handle_alert(_ALERT)
         r2 = handle_alert(_ALERT)
         r3 = handle_alert(_ALERT)
