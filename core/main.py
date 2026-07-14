@@ -27,7 +27,8 @@ app.add_middleware(
 @app.post("/alert")
 def receive_alert(payload: dict, background_tasks: BackgroundTasks) -> dict:
     incident = orchestrator.handle_alert(payload)
-    background_tasks.add_task(orchestrator.run_diagnostics, incident["incident_id"], payload)
+    if not incident.get("suppressed"):
+        background_tasks.add_task(orchestrator.run_diagnostics, incident["incident_id"], payload)
     return incident
 
 
