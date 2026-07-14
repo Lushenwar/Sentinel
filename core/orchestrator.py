@@ -12,8 +12,8 @@ RUNBOOKS_DIR = os.path.join(REPO_PATH, "sandbox", "runbooks")
 # Move to Postgres/Redis if you run multiple workers or need durability.
 _DEDUP_WINDOW_S = float(os.getenv("SENTINEL_DEDUP_WINDOW_S", "300"))
 _DEDUP_THRESHOLD = int(os.getenv("SENTINEL_DEDUP_THRESHOLD", "1"))  # Nth hit in window fires
-_recent_alerts: dict[str, list[float]] = defaultdict(list)          # signature -> hit times
-_open_signatures: dict[str, str] = {}                              # signature -> live incident_id
+_recent_alerts: dict[str, list[float]] = defaultdict(list)  # signature -> hit times
+_open_signatures: dict[str, str] = {}  # signature -> live incident_id
 
 
 def _dedup_gate(signature: str) -> tuple[str, str | None]:
@@ -132,7 +132,9 @@ def resolve_incident(incident_id: str) -> dict:
         )
         print(f"[orchestrator] {incident_id} -- postmortem LLM unavailable, degrading: {e}")
     db.update_postmortem(incident_id, draft)
-    _clear_signature((incident.get("trigger_data") or {}).get("error_signature", ""))  # resolved: reopen to new alerts
+    _clear_signature(
+        (incident.get("trigger_data") or {}).get("error_signature", "")
+    )  # resolved: reopen to new alerts
     print(f"[orchestrator] {incident_id} -> resolved, postmortem generated")
     print(f"[metrics] {incident_id} resolve_to_postmortem_s={time.monotonic() - t0:.1f}")
     return db.get_incident(incident_id)
