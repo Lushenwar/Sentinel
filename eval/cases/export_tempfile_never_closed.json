@@ -1,0 +1,90 @@
+{
+  "id": "export_tempfile_never_closed",
+  "category": "file_handle_leak",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "OSError: [Errno 24] Too many open files"
+  },
+  "commits": [
+    {
+      "message": "audit: append order events to a local audit log",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 57,
+      "files": {
+        "app/audit.py": "import json\nimport os\nfrom datetime import datetime, timezone\n\nAUDIT_LOG = os.environ.get(\"ORDERS_AUDIT_LOG\", \"/var/log/orders/audit.jsonl\")\n\n\ndef record(event: str, subject_id: str):\n    line = {\"ts\": datetime.now(timezone.utc).isoformat(), \"event\": event, \"subject\": subject_id}\n    with open(AUDIT_LOG, \"a\") as fh:\n        fh.write(json.dumps(line) + \"\\n\")\n",
+        "app/handlers/orders.py": [
+          [
+            "from app import db, serializers\n",
+            "from app import audit, db, serializers\n"
+          ],
+          [
+            "    payments.charge(order_id, total, card_token)\n",
+            "    payments.charge(order_id, total, card_token)\n    audit.record(\"order.created\", order_id)\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "exports: write atomically via temp file and rename",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 44,
+      "files": {
+        "app/exports.py": [
+          [
+            "import os\n",
+            "import os\nimport tempfile\n"
+          ],
+          [
+            "    with open(path, \"w\", newline=\"\") as fh:\n        writer = csv.writer(fh)\n        writer.writerow([\"id\", \"status\", \"total\", \"created_at\"])\n        for o in orders:\n            writer.writerow([o[\"id\"], o[\"status\"], o[\"total\"], o[\"created_at\"]])\n    return path\n",
+            "    tmp = tempfile.NamedTemporaryFile(\"w\", dir=os.path.dirname(path), suffix=\".tmp\", delete=False, newline=\"\")\n    writer = csv.writer(tmp)\n    writer.writerow([\"id\", \"status\", \"total\", \"created_at\"])\n    for o in orders:\n        writer.writerow([o[\"id\"], o[\"status\"], o[\"total\"], o[\"created_at\"]])\n    tmp.flush()\n    os.replace(tmp.name, path)\n    return path\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: move exports to shared volume",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "config.json": [
+          [
+            "\"/var/lib/orders/exports\"",
+            "\"/mnt/shared/orders/exports\""
+          ]
+        ]
+      }
+    },
+    {
+      "message": "deps: bump PyJWT to 2.9.0",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 18,
+      "files": {
+        "requirements.txt": [
+          [
+            "PyJWT==2.8.0",
+            "PyJWT==2.9.0"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 5,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 1,
+    "expected_runbook_id": "file_handle_exhaustion",
+    "note": "The temp-file rewrite never closes the NamedTemporaryFile, leaking a descriptor per export. The audit log opens a file per order but closes it via the with block."
+  }
+}

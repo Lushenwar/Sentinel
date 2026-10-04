@@ -1,0 +1,81 @@
+{
+  "id": "redis_legacy_lrem_args",
+  "category": "dependency_version",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "FulfilmentWorker_Crashloop",
+    "error_signature": "redis.exceptions.ResponseError: value is not an integer or out of range"
+  },
+  "commits": [
+    {
+      "message": "deps: pin redis client to 2.10.6 to match fulfilment host image",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 57,
+      "files": {
+        "requirements.txt": [
+          [
+            "redis==5.0.8",
+            "redis==2.10.6"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "worker: remove acked job from the tail of the processing list",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 44,
+      "files": {
+        "app/worker.py": [
+          [
+            "_r.lrem(PROCESSING, 1, raw)",
+            "_r.lrem(PROCESSING, -1, raw)"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "worker: shorter idle poll",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "app/worker.py": [
+          [
+            "timeout=5)",
+            "timeout=2)"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "deps: bump PyJWT to 2.9.0",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 18,
+      "files": {
+        "requirements.txt": [
+          [
+            "PyJWT==2.8.0",
+            "PyJWT==2.9.0"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "cache: type hints",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 5,
+      "files": {
+        "app/cache.py": [
+          [
+            "    def get(self, key):\n",
+            "    def get(self, key: str):\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 0,
+    "expected_runbook_id": "dependency_regressions",
+    "note": "redis-py 2.x uses lrem(name, value, num); 3.0+ uses lrem(name, count, value). Under 2.10.6 the job payload is sent as the count. A count of -1 is valid in the current argument order."
+  }
+}

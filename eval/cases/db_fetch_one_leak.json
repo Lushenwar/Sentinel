@@ -1,0 +1,81 @@
+{
+  "id": "db_fetch_one_leak",
+  "category": "db_pool_exhaustion",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "psycopg2.pool.PoolError: connection pool exhausted"
+  },
+  "commits": [
+    {
+      "message": "db: tag connections with application_name",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 57,
+      "files": {
+        "app/db.py": [
+          [
+            "            connect_timeout=settings.get(\"db\", \"connect_timeout_s\"),\n",
+            "            connect_timeout=settings.get(\"db\", \"connect_timeout_s\"),\n            application_name=\"orders-service\",\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "db: fetch_one without materialising every row",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 44,
+      "files": {
+        "app/db.py": [
+          [
+            "def fetch_one(sql: str, params: tuple = ()):\n    rows = fetch_all(sql, params)\n    return rows[0] if rows else None\n",
+            "def fetch_one(sql: str, params: tuple = ()):\n    pool = get_pool()\n    conn = pool.getconn()\n    with conn.cursor() as cur:\n        cur.execute(sql, params)\n        row = cur.fetchone()\n    if row is None:\n        return None\n    pool.putconn(conn)\n    return row\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: shrink db pool to fit pgbouncer per-client limit",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "config.json": [
+          [
+            "\"pool_size\": 10",
+            "\"pool_size\": 6"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: name the stock shortfall list",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 18,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "    short = [line[\"sku\"] for line in lines if stock[line[\"sku\"]] < line[\"qty\"]]\n    if short:\n        return {\"status\": 409, \"body\": {\"error\": \"insufficient stock\", \"skus\": short}}\n",
+            "    shortfall = [line[\"sku\"] for line in lines if stock[line[\"sku\"]] < line[\"qty\"]]\n    if shortfall:\n        return {\"status\": 409, \"body\": {\"error\": \"insufficient stock\", \"skus\": shortfall}}\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 5,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 1,
+    "expected_runbook_id": "db_failures",
+    "note": "fetch_one returns before putconn on every miss (and on any exception), leaking one connection per lookup that finds nothing; a pool of 6 only lowers the ceiling, it cannot be exhausted without a leak."
+  }
+}
