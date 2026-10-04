@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile.core
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-sentinel}@postgres:5432/postgres
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
     ports:
       - "8000:8000"

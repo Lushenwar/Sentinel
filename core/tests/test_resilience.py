@@ -1,9 +1,11 @@
-# ponytail: all external boundaries (db, git, chroma, openrouter, slack) mocked — offline + deterministic
+# ponytail: all external boundaries (db, git, chroma, claude api, slack) mocked — offline + deterministic
 import json
 import subprocess
 from pathlib import Path
+from types import SimpleNamespace as NS
 from unittest.mock import patch
 
+import anthropic
 import httpx
 import jsonschema
 import pytest
@@ -48,45 +50,44 @@ _RUNBOOKS = [
 ]
 
 
-def _tool_response(arguments: str):
-    return {
-        "choices": [
-            {"message": {"tool_calls": [{"function": {"name": "rank_commits", "arguments": arguments}}]}}
-        ]
-    }
+def _tool_response(tool_input: dict):
+    return NS(stop_reason="tool_use", content=[NS(type="tool_use", name="rank_commits", input=tool_input)])
 
 
 # ---------- LLM failure modes (7A) ----------
 
 
 def test_llm_timeout_raises_llm_unavailable():
-    with patch("core.services.llm_analyzer.chat", side_effect=httpx.TimeoutException("timed out")):
+    with patch(
+        "core.services.llm_analyzer.chat",
+        side_effect=anthropic.APITimeoutError(request=httpx.Request("POST", "https://api.anthropic.com")),
+    ):
         with pytest.raises(LLMUnavailable, match="request failed"):
             rank_suspect_commits(_DIFFS, _ALERT)
 
 
-def test_llm_malformed_json_raises_llm_unavailable():
-    with patch("core.services.llm_analyzer.chat", return_value=_tool_response("{not json")):
+def test_llm_missing_field_raises_llm_unavailable():
+    with patch("core.services.llm_analyzer.chat", return_value=_tool_response({"ranked": []})):
         with pytest.raises(LLMUnavailable, match="malformed"):
             rank_suspect_commits(_DIFFS, _ALERT)
 
 
 def test_llm_non_schema_output_raises_llm_unavailable():
-    bad = json.dumps({"ranked_commits": [{"commit_hash": "abc", "confidence_score": 7}]})
+    bad = {"ranked_commits": [{"commit_hash": "abc", "confidence_score": 7}]}
     with patch("core.services.llm_analyzer.chat", return_value=_tool_response(bad)):
         with pytest.raises(LLMUnavailable, match="malformed"):
             rank_suspect_commits(_DIFFS, _ALERT)
 
 
 def test_llm_empty_response_raises_llm_unavailable():
-    with patch("core.services.llm_analyzer.chat", return_value={"choices": [{"message": {}}]}):
+    with patch("core.services.llm_analyzer.chat", return_value=NS(stop_reason="refusal", content=[])):
         with pytest.raises(LLMUnavailable, match="empty or refused"):
             rank_suspect_commits(_DIFFS, _ALERT)
 
 
 def test_postmortem_empty_content_raises_llm_unavailable():
     incident = {"id": "inc_x", "trigger_data": _ALERT, "diagnostics": {}}
-    with patch("core.services.postmortem.chat", return_value={"choices": [{"message": {"content": ""}}]}):
+    with patch("core.services.postmortem.chat", return_value=NS(stop_reason="end_turn", content=[])):
         with pytest.raises(LLMUnavailable):
             generate_postmortem(incident)
 

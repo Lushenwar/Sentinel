@@ -13,10 +13,11 @@ import time
 from contextlib import nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace as NS
 from unittest.mock import patch
 
 from core import orchestrator
-from core.services import git_client, llm_analyzer, openrouter, vector_store
+from core.services import git_client, llm, llm_analyzer, vector_store
 from eval import config, fixture
 
 ROOT = Path(__file__).parent.parent
@@ -68,7 +69,7 @@ def run_trial(case: dict, condition: str) -> dict:
 
 
 def _fake_chat(messages, **_):
-    """Dry-run stand-in for openrouter.chat: ranks commits in prompt order."""
+    """Dry-run stand-in for llm.chat: ranks commits in prompt order."""
     hashes = re.findall(r"^COMMIT (\w{7}) \|", messages[0]["content"], flags=re.M)
     ranked = [
         {
@@ -80,10 +81,8 @@ def _fake_chat(messages, **_):
         }
         for i, h in enumerate(hashes)
     ]
-    args = json.dumps({"ranked_commits": ranked})
-    return {
-        "choices": [{"message": {"tool_calls": [{"function": {"name": "rank_commits", "arguments": args}}]}}]
-    }
+    block = NS(type="tool_use", name="rank_commits", input={"ranked_commits": ranked})
+    return NS(stop_reason="tool_use", content=[block])
 
 
 def _git_sha() -> str:
@@ -116,7 +115,7 @@ def main(argv=None):
         "eval_set_version": config.EVAL_SET_VERSION,
         "runbook_corpus_version": config.RUNBOOK_CORPUS_VERSION,
         "runbooks_ingested": n_runbooks,
-        "model": openrouter.MODEL,
+        "model": llm.MODEL,
         "sentinel_git_sha": _git_sha(),
         "started_at": datetime.now(timezone.utc).isoformat(),
         "trials": args.trials,

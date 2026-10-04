@@ -1,6 +1,6 @@
-import json
-import httpx
-from .openrouter import chat
+import anthropic
+
+from .llm import chat
 
 
 class LLMUnavailable(Exception):
@@ -8,29 +8,26 @@ class LLMUnavailable(Exception):
 
 
 _RANK_TOOL = {
-    "type": "function",
-    "function": {
-        "name": "rank_commits",
-        "description": "Rank commits by likelihood of causing the incident. Include ALL commits, scored 0-1.",
-        "parameters": {
-            "type": "object",
-            "required": ["ranked_commits"],
-            "properties": {
-                "ranked_commits": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": ["commit_hash", "author", "timestamp", "rationale", "confidence_score"],
-                        "properties": {
-                            "commit_hash": {"type": "string"},
-                            "author": {"type": "string"},
-                            "timestamp": {"type": "string"},
-                            "rationale": {"type": "string"},
-                            "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
-                        },
+    "name": "rank_commits",
+    "description": "Rank commits by likelihood of causing the incident. Include ALL commits, scored 0-1.",
+    "input_schema": {
+        "type": "object",
+        "required": ["ranked_commits"],
+        "properties": {
+            "ranked_commits": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": ["commit_hash", "author", "timestamp", "rationale", "confidence_score"],
+                    "properties": {
+                        "commit_hash": {"type": "string"},
+                        "author": {"type": "string"},
+                        "timestamp": {"type": "string"},
+                        "rationale": {"type": "string"},
+                        "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
                     },
-                }
-            },
+                },
+            }
         },
     },
 }
@@ -62,24 +59,22 @@ def rank_suspect_commits(diffs: list[dict], alert: dict) -> list[dict]:
         response = chat(
             messages=[{"role": "user", "content": prompt}],
             tools=[_RANK_TOOL],
-            tool_choice={"type": "function", "function": {"name": "rank_commits"}},
-            max_tokens=1024,
+            tool_choice={"type": "tool", "name": "rank_commits"},
         )
-        message = response["choices"][0]["message"]
-    except httpx.HTTPError as e:
+    except anthropic.APIError as e:
         raise LLMUnavailable(f"LLM request failed: {e}") from e
-    except (KeyError, IndexError, TypeError) as e:
-        raise LLMUnavailable(f"unexpected LLM response shape: {e}") from e
 
-    for call in message.get("tool_calls") or []:
-        if call["function"]["name"] == "rank_commits":
+    for block in response.content:
+        if block.type == "tool_use" and block.name == "rank_commits":
             try:
-                ranked = json.loads(call["function"]["arguments"])["ranked_commits"]
+                ranked = block.input["ranked_commits"]
                 for c in ranked:
                     if not 0 <= c["confidence_score"] <= 1:
                         raise ValueError(f"confidence_score out of range: {c['confidence_score']}")
                 return sorted(ranked, key=lambda c: c["confidence_score"], reverse=True)
-            except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+            except (KeyError, TypeError, ValueError) as e:
                 raise LLMUnavailable(f"malformed rank_commits output: {e}") from e
 
-    raise LLMUnavailable("empty or refused response: no rank_commits tool call returned")
+    raise LLMUnavailable(
+        f"empty or refused response: no rank_commits tool call returned (stop_reason={response.stop_reason})"
+    )
