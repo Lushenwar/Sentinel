@@ -114,6 +114,8 @@ def print_summary(name: str, res: dict):
         f"wrong {_fmt_conf(s['conf_wrong'])} (n={s['n_wrong']})"
     )
     print(f"  rank latency median {s['latency_median_s']}s (n={s['n']})")
+    if res.get("aborted"):
+        print(f"  WARNING run ABORTED, not a valid measurement: {res['aborted']}")
     truncated = sorted({r["case_id"] for r in res["records"] if r["truncated_diffs"]})
     if truncated:
         print(f"  WARNING diffs hit the 3000-char truncation in: {', '.join(truncated)}")

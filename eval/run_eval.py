@@ -20,6 +20,7 @@ from core.services import git_client, llm_analyzer, openrouter, vector_store
 from eval import config, fixture
 
 ROOT = Path(__file__).parent.parent
+MAX_CONSECUTIVE_ERRORS = 5
 
 
 def run_trial(case: dict, condition: str) -> dict:
@@ -125,19 +126,30 @@ def main(argv=None):
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    streak = 0
     with patch.object(llm_analyzer, "chat", _fake_chat) if args.dry_run else nullcontext():
-        for trial in range(args.trials):
-            for case in cases:
-                rec = {"trial": trial, **run_trial(case, args.condition)}
-                out["records"].append(rec)
-                # rewrite after every trial so an interrupted run keeps what it measured
-                out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
-                status = rec["error"] or f"culprit rank {rec['culprit_rank']}"
-                print(f"[eval] trial {trial} {case['id']}: {status} ({rec['rank_latency_s']}s)")
+        for trial, case in ((t, c) for t in range(args.trials) for c in cases):
+            rec = {"trial": trial, **run_trial(case, args.condition)}
+            out["records"].append(rec)
+            # rewrite after every trial so an interrupted run keeps what it measured
+            out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
+            status = rec["error"] or f"culprit rank {rec['culprit_rank']}"
+            print(f"[eval] trial {trial} {case['id']}: {status} ({rec['rank_latency_s']}s)", flush=True)
+            streak = streak + 1 if rec["error"] else 0
+            if streak >= MAX_CONSECUTIVE_ERRORS:
+                # ponytail: a dead key / empty balance is not a model failure; stop instead of
+                # burning the remaining cases. The partial file is kept and marked, never scored as a run.
+                out["aborted"] = f"{streak} consecutive LLM errors; last: {rec['error'][:200]}"
+                break
 
     out["finished_at"] = datetime.now(timezone.utc).isoformat()
     out_path.write_text(json.dumps(out, indent=2), encoding="utf-8")
-    print(f"[eval] wrote {len(out['records'])} records to {out_path}")
+    print(
+        f"[eval] wrote {len(out['records'])} records to {out_path}"
+        + (" (ABORTED)" if "aborted" in out else "")
+    )
+    if "aborted" in out:
+        raise SystemExit(f"[eval] aborted: {out['aborted']}")
 
 
 if __name__ == "__main__":
