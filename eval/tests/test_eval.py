@@ -4,6 +4,7 @@ import inspect
 import re
 from unittest.mock import patch
 
+import httpx
 import pytest
 
 from core.services import git_client, llm_analyzer
@@ -144,3 +145,20 @@ def test_no_label_leaks_into_prompt(condition):
                 assert value not in prompt, f"{case['id']}: {value!r} leaked into prompt"
             assert "culprit" not in prompt.lower()
     assert len(prompts) == len(CASES)
+
+
+def test_run_aborts_after_consecutive_llm_errors(tmp_path):
+    out = tmp_path / "r.json"
+
+    def dead_key(*_a, **_kw):
+        raise httpx.HTTPError("402 Payment Required")
+
+    with (
+        patch.object(llm_analyzer, "chat", dead_key),
+        patch.object(run_eval.vector_store, "ingest_runbooks", return_value=0),
+        patch.object(run_eval.vector_store, "find_matching_runbooks", return_value=[]),
+        pytest.raises(SystemExit),
+    ):
+        run_eval.main(["--condition", "baseline", "--trials", "3", "--out", str(out)])
+    res = report.load(out)
+    assert len(res["records"]) == run_eval.MAX_CONSECUTIVE_ERRORS and "aborted" in res
