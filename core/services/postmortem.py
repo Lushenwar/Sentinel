@@ -1,5 +1,6 @@
-import httpx
-from .openrouter import chat
+import anthropic
+
+from .llm import chat
 from .llm_analyzer import LLMUnavailable
 
 
@@ -22,12 +23,12 @@ def generate_postmortem(incident: dict) -> str:
     )
 
     try:
-        response = chat(messages=[{"role": "user", "content": prompt}], max_tokens=1024)
-        content = response["choices"][0]["message"]["content"]
-    except httpx.HTTPError as e:
+        response = chat(messages=[{"role": "user", "content": prompt}])
+    except anthropic.APIError as e:
         raise LLMUnavailable(f"LLM request failed: {e}") from e
-    except (KeyError, IndexError, TypeError) as e:
-        raise LLMUnavailable(f"unexpected LLM response shape: {e}") from e
+    content = "".join(b.text for b in response.content if b.type == "text")
     if not content:
-        raise LLMUnavailable("empty or refused response: no postmortem content returned")
+        raise LLMUnavailable(
+            f"empty or refused response: no postmortem content returned (stop_reason={response.stop_reason})"
+        )
     return content

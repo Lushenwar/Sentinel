@@ -4,6 +4,7 @@ import inspect
 import re
 from unittest.mock import patch
 
+import anthropic
 import httpx
 import pytest
 
@@ -151,7 +152,7 @@ def test_run_aborts_after_consecutive_llm_errors(tmp_path):
     out = tmp_path / "r.json"
 
     def dead_key(*_a, **_kw):
-        raise httpx.HTTPError("402 Payment Required")
+        raise anthropic.APIConnectionError(request=httpx.Request("POST", "https://api.anthropic.com"))
 
     with (
         patch.object(llm_analyzer, "chat", dead_key),

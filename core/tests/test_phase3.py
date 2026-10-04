@@ -1,4 +1,5 @@
 # ponytail: mocks httpx/anthropic so tests run without live webhook or API key
+from types import SimpleNamespace as NS
 from unittest.mock import patch, MagicMock
 from core.services.notifier import build_incident_card, post_incident_to_slack
 from core.services.postmortem import generate_postmortem
@@ -46,9 +47,9 @@ def test_post_incident_to_slack_posts_when_configured():
 
 
 def test_generate_postmortem_returns_llm_text():
-    fake_response = {
-        "choices": [{"message": {"content": "## Summary\nDB pool misconfigured."}}],
-    }
+    fake_response = NS(
+        stop_reason="end_turn", content=[NS(type="text", text="## Summary\nDB pool misconfigured.")]
+    )
     with patch("core.services.postmortem.chat", return_value=fake_response):
         result = generate_postmortem(_INCIDENT)
     assert "Summary" in result

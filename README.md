@@ -16,7 +16,7 @@ Slack, and drafts the postmortem on resolution.
 
 ```bash
 git clone https://github.com/Lushenwar/Sentinel.git && cd Sentinel
-cp .env.example .env        # set OPENROUTER_API_KEY (and optionally SLACK_WEBHOOK_URL)
+cp .env.example .env        # set ANTHROPIC_API_KEY (and optionally SLACK_WEBHOOK_URL)
 docker-compose up           # dashboard :3000, core API :8000, sandbox app :8001, Postgres :5432
 
 # trigger an incident (in another terminal)
@@ -30,7 +30,7 @@ docker-compose exec core python -m sandbox.chaos_cli resolve-bug --incident <inc
 
 ```bash
 pip install -e core/
-cp .env.example .env                        # fill in DATABASE_URL, OPENROUTER_API_KEY
+cp .env.example .env                        # fill in DATABASE_URL, ANTHROPIC_API_KEY
 uvicorn core.main:app --port 8000           # terminal 1: core engine
 uvicorn sandbox.app.main:app --port 8001    # terminal 2: sandbox toy app
 python -m sandbox.chaos_cli trigger-bug --type db_failure

@@ -10,7 +10,7 @@ jobs:
     env:
       # tests mock all external boundaries; these only satisfy import-time env lookups
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-      OPENROUTER_API_KEY: ci-dummy
+      ANTHROPIC_API_KEY: ci-dummy
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
