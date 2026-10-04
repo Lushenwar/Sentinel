@@ -1,3 +1,4 @@
+import os
 from functools import cache
 
 import anthropic
@@ -9,7 +10,9 @@ MODEL = "claude-sonnet-5"
 
 @cache
 def _client() -> anthropic.Anthropic:
-    return anthropic.Anthropic()  # ANTHROPIC_API_KEY from env / .env
+    # ANTHROPIC_API_KEY from env / .env; org-level keys also need the workspace header
+    workspace = os.getenv("ANTHROPIC_WORKSPACE_ID")
+    return anthropic.Anthropic(default_headers={"anthropic-workspace-id": workspace} if workspace else None)
 
 
 def chat(
