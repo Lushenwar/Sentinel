@@ -18,9 +18,9 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install -e core/ pytest jsonschema black flake8
-      - run: black --check --line-length 110 core sandbox
-      - run: flake8 core sandbox
-      - run: pytest core/tests -q
+      - run: black --check --line-length 110 core sandbox eval
+      - run: flake8 core sandbox eval
+      - run: pytest core/tests eval/tests -q
 
   dashboard:
     runs-on: ubuntu-latest
