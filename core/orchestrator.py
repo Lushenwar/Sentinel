@@ -13,6 +13,8 @@ RUNBOOKS_DIR = os.path.join(REPO_PATH, "sandbox", "runbooks")
 _DEDUP_WINDOW_S = float(os.getenv("SENTINEL_DEDUP_WINDOW_S", "300"))
 _DEDUP_THRESHOLD = int(os.getenv("SENTINEL_DEDUP_THRESHOLD", "1"))  # Nth hit in window fires
 _recent_alerts: dict[str, list[float]] = defaultdict(list)  # signature -> hit times
+# Pass matched runbook text into commit ranking. Default off until the Phase 9 A/B decides (METRICS.md).
+_RAG_RANKING = os.getenv("SENTINEL_RAG_RANKING", "0") == "1"
 _open_signatures: dict[str, str] = {}  # signature -> live incident_id
 
 
@@ -69,12 +71,21 @@ def run_diagnostics(incident_id: str, alert_data: dict):
         diffs = git_client.get_recent_diffs(REPO_PATH, alert_data["timestamp"])
         print(f"[orchestrator] {incident_id} -- {len(diffs)} commits in window")
 
-        runbooks = vector_store.find_matching_runbooks(alert_data.get("error_signature", ""))
-        print(f"[orchestrator] {incident_id} -- {len(runbooks)} runbooks matched")
+        try:
+            runbooks = vector_store.find_matching_runbooks(
+                alert_data.get("error_signature", ""), include_content=_RAG_RANKING
+            )
+            print(f"[orchestrator] {incident_id} -- {len(runbooks)} runbooks matched")
+        except Exception as e:  # retrieval is optional context; never a reason to abort triage
+            runbooks = []
+            print(f"[orchestrator] {incident_id} -- runbook retrieval failed, ranking without: {e}")
 
         degraded_reason = None
         try:
-            ranked = llm_analyzer.rank_suspect_commits(diffs, alert_data) if diffs else []
+            rank_runbooks = runbooks if _RAG_RANKING else None
+            ranked = (
+                llm_analyzer.rank_suspect_commits(diffs, alert_data, runbooks=rank_runbooks) if diffs else []
+            )
             print(f"[orchestrator] {incident_id} -- LLM ranked {len(ranked)} suspects")
         except llm_analyzer.LLMUnavailable as e:
             ranked, degraded_reason = [], str(e)
@@ -82,7 +93,8 @@ def run_diagnostics(incident_id: str, alert_data: dict):
 
         diagnostics = {
             "suspect_commits": ranked,
-            "matched_runbooks": runbooks,
+            # runbook text is prompt-only; never persisted or sent to Slack
+            "matched_runbooks": [{k: v for k, v in r.items() if k != "content"} for r in runbooks],
             "impact_assessment": {
                 "error_rate_delta_pct": alert_data.get("error_rate_pct"),
                 "estimated_affected_users": None,

@@ -13,3 +13,8 @@ FLOOR_CANDIDATES = [0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
 # Words that would announce the culprit. Checked (word-prefix, case-insensitive) in commit
 # messages and in every file the case writes, including the shared base.
 BANNED_WORDS = ["bug", "inject", "break", "fault", "fail", "chaos", "oops", "fix", "hotfix", "revert"]
+
+# Runbook similarity floor for the RAG condition, frozen at 9E before any RAG run. Chosen from the v2 baseline
+# retrieval table alone: the candidate maximising (correct runbooks kept - null cases given a runbook):
+# 0.15->5, 0.25->3, 0.30->6, 0.35->7, 0.40->5. Must equal core.services.llm_analyzer.RUNBOOK_FLOOR.
+RUNBOOK_FLOOR = 0.35

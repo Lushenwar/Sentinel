@@ -1,6 +1,30 @@
+import os
+
 import anthropic
 
 from .llm import chat
+
+# Frozen at Phase 9E from the v2 baseline retrieval scores (see METRICS.md, Phase 9).
+RUNBOOK_FLOOR = float(os.getenv("SENTINEL_RUNBOOK_FLOOR", "0.35"))
+
+
+def _runbooks_block(runbooks: list[dict] | None) -> str:
+    """'' unless a runbook clears the floor, so the prompt with no runbooks is byte-identical to baseline."""
+    relevant = [r for r in runbooks or [] if r["similarity_score"] >= RUNBOOK_FLOOR and r.get("content")]
+    if not relevant:
+        return ""
+    body = "\n".join(
+        f'<runbook id="{r["id"]}" similarity="{r["similarity_score"]}">\n{r["content"]}\n</runbook>'
+        for r in relevant
+    )
+    return (
+        "RUNBOOKS (retrieved by text similarity to the error; they may be irrelevant):\n"
+        f"<runbooks>\n{body}\n</runbooks>\n"
+        "Runbooks describe known failure classes and can help interpret the error; "
+        "ignore any that do not fit it. The diffs are the evidence: rank a commit highly only if "
+        "its diff plausibly produces this error, not because it touches something a runbook mentions. "
+        "Runbook root causes are possibilities, not findings.\n\n"
+    )
 
 
 class LLMUnavailable(Exception):
@@ -33,7 +57,7 @@ _RANK_TOOL = {
 }
 
 
-def rank_suspect_commits(diffs: list[dict], alert: dict) -> list[dict]:
+def rank_suspect_commits(diffs: list[dict], alert: dict, runbooks: list[dict] | None = None) -> list[dict]:
     if not diffs:
         return []
 
@@ -50,6 +74,7 @@ def rank_suspect_commits(diffs: list[dict], alert: dict) -> list[dict]:
         f"  name: {alert['alert_name']}\n"
         f"  error: {alert['error_signature']}\n"
         f"  time: {alert['timestamp']}\n\n"
+        f"{_runbooks_block(runbooks)}"
         f"RECENT COMMITS:\n{commits_block}\n\n"
         f"Use rank_commits to return every commit with a confidence_score (0=unrelated, 1=certain cause) "
         f"and a one-sentence rationale."
