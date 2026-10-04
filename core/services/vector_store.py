@@ -1,7 +1,8 @@
+import os
 from pathlib import Path
 import chromadb
 
-CHROMA_PATH = ".chroma"
+CHROMA_PATH = os.getenv("SENTINEL_CHROMA_PATH", ".chroma")
 COLLECTION = "runbooks"
 
 
