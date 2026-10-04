@@ -1,0 +1,79 @@
+{
+  "id": "mem_worker_seen_ids_01",
+  "category": "memory_growth",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "FulfilmentWorker_Memory_High",
+    "error_signature": "fulfilment-worker OOMKilled (exit code 137): rss 3.8GiB of 4GiB limit, rss growing linearly with jobs processed"
+  },
+  "commits": [
+    {
+      "message": "config: raise stock cache size",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 54,
+      "files": {
+        "config.json": [
+          [
+            "\"max_entries\": 5000",
+            "\"max_entries\": 8000"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "worker: skip duplicate fulfilment jobs",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 39,
+      "files": {
+        "app/worker.py": [
+          [
+            "QUEUE = \"fulfilment\"\n",
+            "_seen_jobs: list[str] = []\nQUEUE = \"fulfilment\"\n"
+          ],
+          [
+            "        job = json.loads(raw)\n        handle(job)\n",
+            "        job = json.loads(raw)\n        if job[\"id\"] not in _seen_jobs:\n            handle(job)\n            _seen_jobs.append(job[\"id\"])\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 24,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "cache: track hit and miss counts",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 11,
+      "files": {
+        "app/cache.py": [
+          [
+            "        self._data: dict = {}\n",
+            "        self._data: dict = {}\n        self.hits = 0\n        self.misses = 0\n"
+          ],
+          [
+            "        entry = self._data.get(key)\n        if entry is None:\n            return None\n",
+            "        entry = self._data.get(key)\n        if entry is None:\n            self.misses += 1\n            return None\n"
+          ],
+          [
+            "            del self._data[key]\n            return None\n        return value\n",
+            "            del self._data[key]\n            self.misses += 1\n            return None\n        self.hits += 1\n        return value\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 1,
+    "expected_runbook_id": "memory_leaks"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "cfg_cache_size_string_01",
+  "category": "config_type_error",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "TypeError: '>=' not supported between instances of 'int' and 'str'"
+  },
+  "commits": [
+    {
+      "message": "cache: track hit and miss counts",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 55,
+      "files": {
+        "app/cache.py": [
+          [
+            "        self._data: dict = {}\n",
+            "        self._data: dict = {}\n        self.hits = 0\n        self.misses = 0\n"
+          ],
+          [
+            "        entry = self._data.get(key)\n        if entry is None:\n            return None\n",
+            "        entry = self._data.get(key)\n        if entry is None:\n            self.misses += 1\n            return None\n"
+          ],
+          [
+            "            del self._data[key]\n            return None\n        return value\n",
+            "            del self._data[key]\n            self.misses += 1\n            return None\n        self.hits += 1\n        return value\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: raise stock cache size for holiday catalog",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 41,
+      "files": {
+        "config.json": [
+          [
+            "\"cache\": {\"ttl_s\": 300, \"max_entries\": 5000}",
+            "\"cache\": {\"ttl_s\": 300, \"max_entries\": \"20_000\"}"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "inventory: send request id header",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 27,
+      "files": {
+        "app/clients/inventory.py": [
+          [
+            "def get_stock(sku: str) -> int:\n",
+            "def get_stock(sku: str, request_id: str | None = None) -> int:\n"
+          ],
+          [
+            "        timeout=settings.get(\"inventory\", \"timeout_s\"),\n",
+            "        headers={\"X-Request-Id\": request_id} if request_id else None,\n        timeout=settings.get(\"inventory\", \"timeout_s\"),\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: describe exports module",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 12,
+      "files": {
+        "README.md": [
+          [
+            "- `app/worker.py` fulfilment queue consumer\n",
+            "- `app/worker.py` fulfilment queue consumer\n- `app/exports.py` nightly CSV export to `exports.dir`\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 1,
+    "expected_runbook_id": "config_parse_errors"
+  }
+}

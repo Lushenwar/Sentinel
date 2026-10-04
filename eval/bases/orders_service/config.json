@@ -1,0 +1,10 @@
+{
+  "db": {"host": "10.0.4.12", "port": 5432, "name": "orders", "pool_size": 10, "connect_timeout_s": 5},
+  "payments": {"base_url": "https://payments.internal", "timeout_s": 8, "retries": 2},
+  "inventory": {"base_url": "https://inventory.internal", "timeout_s": 3},
+  "gateway": {"upstream_timeout_s": 15},
+  "cache": {"ttl_s": 300, "max_entries": 5000},
+  "api": {"page_size": 50, "max_page_size": 200},
+  "auth": {"issuer": "https://auth.internal", "audience": "orders-api", "leeway_s": 30},
+  "exports": {"dir": "/var/lib/orders/exports"}
+}

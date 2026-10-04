@@ -1,0 +1,66 @@
+{
+  "id": "null_stock_payload_02",
+  "category": "null_or_missing_field",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "TypeError: '<' not supported between instances of 'NoneType' and 'int'"
+  },
+  "commits": [
+    {
+      "message": "inventory: parse stock payload with .get",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 49,
+      "files": {
+        "app/clients/inventory.py": [
+          [
+            "    qty = resp.json()[\"available\"]\n",
+            "    qty = resp.json().get(\"available\")\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: log order totals",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 34,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "from app import db, serializers\n",
+            "import logging\n\nfrom app import db, serializers\n"
+          ],
+          [
+            "_ORDER_SQL =",
+            "log = logging.getLogger(__name__)\n\n_ORDER_SQL ="
+          ],
+          [
+            "    total = sum(line[\"qty\"] * line[\"unit_price_cents\"] for line in lines)\n",
+            "    total = sum(line[\"qty\"] * line[\"unit_price_cents\"] for line in lines)\n    log.info(\"order total computed\", extra={\"customer_id\": customer_id, \"total_cents\": total})\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "payments: refund takes optional amount",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 15,
+      "files": {
+        "app/clients/payments.py": [
+          [
+            "def refund(charge_id: str) -> dict:\n",
+            "def refund(charge_id: str, amount_cents: int | None = None) -> dict:\n"
+          ],
+          [
+            "        f\"{settings.get('payments', 'base_url')}/v1/charges/{charge_id}/refund\",\n",
+            "        f\"{settings.get('payments', 'base_url')}/v1/charges/{charge_id}/refund\",\n        json={\"amount_cents\": amount_cents} if amount_cents else None,\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 0,
+    "expected_runbook_id": "null_field_handling"
+  }
+}

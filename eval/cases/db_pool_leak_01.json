@@ -1,0 +1,67 @@
+{
+  "id": "db_pool_leak_01",
+  "category": "db_pool_exhaustion",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "psycopg2.pool.PoolError: connection pool exhausted"
+  },
+  "commits": [
+    {
+      "message": "db: simplify fetch_all",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 58,
+      "files": {
+        "app/db.py": [
+          [
+            "    conn = pool.getconn()\n    try:\n        with conn.cursor() as cur:\n            cur.execute(sql, params)\n            return cur.fetchall()\n    finally:\n        pool.putconn(conn)\n",
+            "    conn = pool.getconn()\n    with conn.cursor() as cur:\n        cur.execute(sql, params)\n        rows = cur.fetchall()\n    pool.putconn(conn)\n    return rows\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: lower db pool size to fit pgbouncer limits",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 44,
+      "files": {
+        "config.json": [
+          [
+            "\"pool_size\": 10",
+            "\"pool_size\": 8"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: name the stock shortfall list",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 29,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "    short = [line[\"sku\"] for line in lines if stock[line[\"sku\"]] < line[\"qty\"]]\n    if short:\n        return {\"status\": 409, \"body\": {\"error\": \"insufficient stock\", \"skus\": short}}\n",
+            "    shortfall = [line[\"sku\"] for line in lines if stock[line[\"sku\"]] < line[\"qty\"]]\n    if shortfall:\n        return {\"status\": 409, \"body\": {\"error\": \"insufficient stock\", \"skus\": shortfall}}\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: describe exports module",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 14,
+      "files": {
+        "README.md": [
+          [
+            "- `app/worker.py` fulfilment queue consumer\n",
+            "- `app/worker.py` fulfilment queue consumer\n- `app/exports.py` nightly CSV export to `exports.dir`\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 0,
+    "expected_runbook_id": "db_failures"
+  }
+}

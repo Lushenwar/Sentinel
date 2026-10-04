@@ -1,0 +1,71 @@
+{
+  "id": "deps_redis_legacy_02",
+  "category": "dependency_version",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "FulfilmentWorker_Crashloop",
+    "error_signature": "redis.exceptions.ResponseError: value is not an integer or out of range"
+  },
+  "commits": [
+    {
+      "message": "worker: shorter idle poll",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 50,
+      "files": {
+        "app/worker.py": [
+          [
+            "timeout=5)",
+            "timeout=2)"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "deps: pin redis to 2.10.6 to match fulfilment host image",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 36,
+      "files": {
+        "requirements.txt": [
+          [
+            "redis==5.0.8",
+            "redis==2.10.6"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "deps: bump PyJWT to 2.9.0",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 22,
+      "files": {
+        "requirements.txt": [
+          [
+            "PyJWT==2.8.0",
+            "PyJWT==2.9.0"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "exports: include currency column",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 8,
+      "files": {
+        "app/exports.py": [
+          [
+            "writer.writerow([\"id\", \"status\", \"total\", \"created_at\"])",
+            "writer.writerow([\"id\", \"status\", \"total\", \"currency\", \"created_at\"])"
+          ],
+          [
+            "writer.writerow([o[\"id\"], o[\"status\"], o[\"total\"], o[\"created_at\"]])",
+            "writer.writerow([o[\"id\"], o[\"status\"], o[\"total\"], o[\"currency\"], o[\"created_at\"]])"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 1,
+    "expected_runbook_id": "dependency_regressions"
+  }
+}
