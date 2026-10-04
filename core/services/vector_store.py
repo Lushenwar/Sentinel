@@ -1,9 +1,11 @@
 import os
+import re
 from pathlib import Path
 import chromadb
 
 CHROMA_PATH = os.getenv("SENTINEL_CHROMA_PATH", ".chroma")
 COLLECTION = "runbooks"
+CONTENT_CAP = 1500  # chars of Symptoms + Root Causes sent to the ranking prompt per runbook
 
 
 def _col():
@@ -23,7 +25,7 @@ def ingest_runbooks(runbooks_dir: str) -> int:
     return len(docs)
 
 
-def find_matching_runbooks(error_signature: str, top_k: int = 3) -> list[dict]:
+def find_matching_runbooks(error_signature: str, top_k: int = 3, include_content: bool = False) -> list[dict]:
     col = _col()
     count = col.count()
     if count == 0:
@@ -37,15 +39,26 @@ def find_matching_runbooks(error_signature: str, top_k: int = 3) -> list[dict]:
         results["documents"][0],
         results["distances"][0],
     ):
-        out.append(
-            {
-                "id": doc_id,
-                "title": meta["title"],
-                "similarity_score": round(1 - dist, 3),
-                "primary_action": _first_action(doc),
-            }
-        )
+        match = {
+            "id": doc_id,
+            "title": meta["title"],
+            "similarity_score": round(1 - dist, 3),
+            "primary_action": _first_action(doc),
+        }
+        if include_content:  # prompt-only; callers must not persist it
+            match["content"] = _prompt_content(doc)
+        out.append(match)
     return out
+
+
+def _section(doc: str, heading: str) -> str:
+    m = re.search(rf"^## {heading}\n(.*?)(?=^## |\Z)", doc, flags=re.M | re.S)
+    return m.group(1).strip() if m else ""
+
+
+def _prompt_content(doc: str) -> str:
+    text = f"Symptoms:\n{_section(doc, 'Symptoms')}\n\nRoot causes:\n{_section(doc, 'Root Causes')}"
+    return text[:CONTENT_CAP]
 
 
 def _first_action(doc: str) -> str:

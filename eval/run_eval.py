@@ -104,6 +104,8 @@ def main(argv=None):
     p.add_argument("--dry-run", action="store_true", help="mock chat(); no API calls")
     args = p.parse_args(argv)
 
+    if llm_analyzer.RUNBOOK_FLOOR != config.RUNBOOK_FLOOR:
+        raise SystemExit(f"runbook floor {llm_analyzer.RUNBOOK_FLOOR} != frozen {config.RUNBOOK_FLOOR}")
     # isolated Chroma store holding exactly the frozen corpus, never the dev .chroma
     vector_store.CHROMA_PATH = tempfile.mkdtemp(prefix="sentinel_eval_chroma_")
     n_runbooks = vector_store.ingest_runbooks(orchestrator.RUNBOOKS_DIR)
@@ -115,6 +117,7 @@ def main(argv=None):
         "eval_set_version": config.EVAL_SET_VERSION,
         "runbook_corpus_version": config.RUNBOOK_CORPUS_VERSION,
         "runbooks_ingested": n_runbooks,
+        "runbook_floor": llm_analyzer.RUNBOOK_FLOOR,
         "model": llm.MODEL,
         "sentinel_git_sha": _git_sha(),
         "started_at": datetime.now(timezone.utc).isoformat(),
