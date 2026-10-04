@@ -1,0 +1,93 @@
+{
+  "id": "payments_body_without_content_type",
+  "category": "http_content_type",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "httpx.HTTPStatusError: Client error '415 Unsupported Media Type' for url 'https://payments.internal/v1/charges'"
+  },
+  "commits": [
+    {
+      "message": "payments: send idempotency key with charges",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 57,
+      "files": {
+        "app/clients/payments.py": [
+          [
+            "        json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n",
+            "        json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n        headers={\"Idempotency-Key\": f\"charge-{order_id}\"},\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: give payments more headroom",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 44,
+      "files": {
+        "config.json": [
+          [
+            "\"timeout_s\": 8,",
+            "\"timeout_s\": 10,"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "payments: serialise charge body with sorted keys for stable idempotency hashing",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "app/clients/payments.py": [
+          [
+            "import httpx\n",
+            "import json\n\nimport httpx\n"
+          ],
+          [
+            "        json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n",
+            "        content=json.dumps(\n            {\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token}, sort_keys=True\n        ),\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: log order totals",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 18,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "from app import db, serializers\n",
+            "import logging\n\nfrom app import db, serializers\n"
+          ],
+          [
+            "_ORDER_SQL =",
+            "log = logging.getLogger(__name__)\n\n_ORDER_SQL ="
+          ],
+          [
+            "    total = sum(line[\"qty\"] * line[\"unit_price_cents\"] for line in lines)\n",
+            "    total = sum(line[\"qty\"] * line[\"unit_price_cents\"] for line in lines)\n    log.info(\"order total computed\", extra={\"customer_id\": customer_id, \"total_cents\": total})\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 5,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 2,
+    "expected_runbook_id": null,
+    "note": "httpx sets Content-Type: application/json only for json=; with content= the body is sent untyped. The idempotency header commit leaves the json= body intact."
+  }
+}

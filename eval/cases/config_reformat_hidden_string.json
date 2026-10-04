@@ -1,0 +1,76 @@
+{
+  "id": "config_reformat_hidden_string",
+  "category": "config_type_error",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "TypeError: '>=' not supported between instances of 'int' and 'str'"
+  },
+  "commits": [
+    {
+      "message": "settings: add section() helper",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 57,
+      "files": {
+        "app/settings.py": [
+          [
+            "    return _CONFIG[section][key]\n",
+            "    return _CONFIG[section][key]\n\n\ndef section(name: str) -> dict:\n    return dict(_CONFIG[name])\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: one key per line for reviewable diffs",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 44,
+      "files": {
+        "config.json": "{\n  \"db\": {\n    \"host\": \"10.0.4.12\",\n    \"port\": 5432,\n    \"name\": \"orders\",\n    \"pool_size\": 10,\n    \"connect_timeout_s\": 5\n  },\n  \"payments\": {\n    \"base_url\": \"https://payments.internal\",\n    \"timeout_s\": 8,\n    \"retries\": 2\n  },\n  \"inventory\": {\n    \"base_url\": \"https://inventory.internal\",\n    \"timeout_s\": 3\n  },\n  \"gateway\": {\n    \"upstream_timeout_s\": 15\n  },\n  \"cache\": {\n    \"ttl_s\": 300,\n    \"max_entries\": \"5000\"\n  },\n  \"api\": {\n    \"page_size\": 50,\n    \"max_page_size\": 200\n  },\n  \"auth\": {\n    \"issuer\": \"https://auth.internal\",\n    \"audience\": \"orders-api\",\n    \"leeway_s\": 30\n  },\n  \"exports\": {\n    \"dir\": \"/var/lib/orders/exports\"\n  }\n}\n"
+      }
+    },
+    {
+      "message": "config: longer stock cache ttl",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "config.json": [
+          [
+            "\"ttl_s\": 300",
+            "\"ttl_s\": 600"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "cache: type hints",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 18,
+      "files": {
+        "app/cache.py": [
+          [
+            "    def get(self, key):\n",
+            "    def get(self, key: str):\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 5,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 1,
+    "expected_runbook_id": "config_parse_errors",
+    "note": "The one-key-per-line reformat quietly turned cache.max_entries into the string \"5000\"; TTLCache.set compares len(...) >= max_entries. The TTL change keeps an int."
+  }
+}
