@@ -1,0 +1,67 @@
+{
+  "id": "rl_inventory_uncached_01",
+  "category": "rate_limit_429",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://inventory.internal/v2/stock/SKU-88412'"
+  },
+  "commits": [
+    {
+      "message": "config: shorten stock cache ttl",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 57,
+      "files": {
+        "config.json": [
+          [
+            "\"ttl_s\": 300",
+            "\"ttl_s\": 240"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "pagination: document page_size bounds",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 43,
+      "files": {
+        "app/pagination.py": [
+          [
+            "def clamp_page_size(requested: int | None) -> int:\n",
+            "def clamp_page_size(requested: int | None) -> int:\n    \"\"\"Requested size clamped to [1, api.max_page_size]; api.page_size when omitted.\"\"\"\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "inventory: read fresh stock for multi-item orders",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 28,
+      "files": {
+        "app/clients/inventory.py": [
+          [
+            "def get_stock_many(skus: list[str]) -> dict[str, int]:\n    return {sku: get_stock(sku) for sku in skus}\n",
+            "def get_stock_many(skus: list[str]) -> dict[str, int]:\n    out = {}\n    for sku in skus:\n        resp = httpx.get(\n            f\"{settings.get('inventory', 'base_url')}/v2/stock/{sku}\",\n            timeout=settings.get(\"inventory\", \"timeout_s\"),\n        )\n        resp.raise_for_status()\n        out[sku] = resp.json()[\"available\"]\n    return out\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 13,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 2,
+    "expected_runbook_id": "rate_limiting"
+  }
+}

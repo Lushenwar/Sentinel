@@ -1,0 +1,54 @@
+{
+  "id": "page_newest_empty_01",
+  "category": "pagination_boundary",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "IndexError: list index out of range"
+  },
+  "commits": [
+    {
+      "message": "pagination: include total count",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 51,
+      "files": {
+        "app/pagination.py": [
+          [
+            "    return {\"items\": items[start:end], \"page\": page, \"has_more\": end < len(items)}\n",
+            "    return {\"items\": items[start:end], \"page\": page, \"has_more\": end < len(items), \"total\": len(items)}\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "serializers: accept Z suffix in since",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 30,
+      "files": {
+        "app/serializers.py": [
+          [
+            "    return datetime.fromisoformat(value) if value else None\n",
+            "    return datetime.fromisoformat(value.replace(\"Z\", \"+00:00\")) if value else None\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: include newest order timestamp in list response",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 12,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "    return {\"status\": 200, \"body\": body}\n\n\ndef create_order",
+            "    body[\"newest_at\"] = rows[0][\"created_at\"].isoformat()\n    return {\"status\": 200, \"body\": body}\n\n\ndef create_order"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 2,
+    "expected_runbook_id": "pagination_errors"
+  }
+}

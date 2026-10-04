@@ -1,0 +1,80 @@
+{
+  "id": "null_since_filter_03",
+  "category": "null_or_missing_field",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "TypeError: '>=' not supported between instances of 'datetime.datetime' and 'NoneType'"
+  },
+  "commits": [
+    {
+      "message": "docs: describe exports module",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 58,
+      "files": {
+        "README.md": [
+          [
+            "- `app/worker.py` fulfilment queue consumer\n",
+            "- `app/worker.py` fulfilment queue consumer\n- `app/exports.py` nightly CSV export to `exports.dir`\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "serializers: accept Z suffix in since",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 45,
+      "files": {
+        "app/serializers.py": [
+          [
+            "    return datetime.fromisoformat(value) if value else None\n",
+            "    return datetime.fromisoformat(value.replace(\"Z\", \"+00:00\")) if value else None\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "pagination: document page_size bounds",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 32,
+      "files": {
+        "app/pagination.py": [
+          [
+            "def clamp_page_size(requested: int | None) -> int:\n",
+            "def clamp_page_size(requested: int | None) -> int:\n    \"\"\"Requested size clamped to [1, api.max_page_size]; api.page_size when omitted.\"\"\"\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: filter order history by since",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 19,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "def list_orders(customer_id: str, page: int = 1, page_size: int | None = None) -> dict:\n    rows = db.fetch_all(_LIST_SQL, (customer_id,))\n",
+            "def list_orders(\n    customer_id: str, page: int = 1, page_size: int | None = None, since: str | None = None\n) -> dict:\n    rows = db.fetch_all(_LIST_SQL, (customer_id,))\n    rows = [r for r in rows if r[\"created_at\"] >= serializers.parse_since(since)]\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "worker: shorter idle poll",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 7,
+      "files": {
+        "app/worker.py": [
+          [
+            "timeout=5)",
+            "timeout=2)"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 3,
+    "expected_runbook_id": "null_field_handling"
+  }
+}

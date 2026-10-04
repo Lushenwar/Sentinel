@@ -1,0 +1,68 @@
+{
+  "id": "rl_payment_retries_02",
+  "category": "rate_limit_429",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_500_Internal_Server_Error",
+    "error_signature": "httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://payments.internal/v1/charges'"
+  },
+  "commits": [
+    {
+      "message": "payments: retry charges on transient errors",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 46,
+      "files": {
+        "config.json": [
+          [
+            "\"timeout_s\": 8, \"retries\": 2",
+            "\"timeout_s\": 8, \"retries\": 5"
+          ]
+        ],
+        "app/clients/payments.py": [
+          [
+            "def charge(order_id: str, amount_cents: int, card_token: str) -> dict:\n    resp = httpx.post(\n        f\"{settings.get('payments', 'base_url')}/v1/charges\",\n        json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n        timeout=settings.get(\"payments\", \"timeout_s\"),\n    )\n    resp.raise_for_status()\n    return resp.json()\n",
+            "def charge(order_id: str, amount_cents: int, card_token: str) -> dict:\n    for _ in range(settings.get(\"payments\", \"retries\") + 1):\n        resp = httpx.post(\n            f\"{settings.get('payments', 'base_url')}/v1/charges\",\n            json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n            timeout=settings.get(\"payments\", \"timeout_s\"),\n        )\n        if resp.status_code < 400:\n            return resp.json()\n    resp.raise_for_status()\n    return resp.json()\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: log order totals",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "from app import db, serializers\n",
+            "import logging\n\nfrom app import db, serializers\n"
+          ],
+          [
+            "_ORDER_SQL =",
+            "log = logging.getLogger(__name__)\n\n_ORDER_SQL ="
+          ],
+          [
+            "    total = sum(line[\"qty\"] * line[\"unit_price_cents\"] for line in lines)\n",
+            "    total = sum(line[\"qty\"] * line[\"unit_price_cents\"] for line in lines)\n    log.info(\"order total computed\", extra={\"customer_id\": customer_id, \"total_cents\": total})\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: describe exports module",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 15,
+      "files": {
+        "README.md": [
+          [
+            "- `app/worker.py` fulfilment queue consumer\n",
+            "- `app/worker.py` fulfilment queue consumer\n- `app/exports.py` nightly CSV export to `exports.dir`\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 0,
+    "expected_runbook_id": "rate_limiting"
+  }
+}

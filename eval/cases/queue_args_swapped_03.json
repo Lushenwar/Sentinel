@@ -1,0 +1,58 @@
+{
+  "id": "queue_args_swapped_03",
+  "category": "queue_stall",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "Queue_Depth_Critical",
+    "error_signature": "fulfilment queue depth 18234 (threshold 5000), consumer throughput 0 jobs/min, worker pods healthy"
+  },
+  "commits": [
+    {
+      "message": "worker: import inventory at module level",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 49,
+      "files": {
+        "app/worker.py": [
+          [
+            "def handle(job: dict):\n    from app.clients import inventory\n\n    inventory.get_stock(job[\"sku\"])\n",
+            "def handle(job: dict):\n    inventory.get_stock(job[\"sku\"])\n"
+          ],
+          [
+            "import redis\n",
+            "import redis\n\nfrom app.clients import inventory\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "deps: bump PyJWT to 2.9.0",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 31,
+      "files": {
+        "requirements.txt": [
+          [
+            "PyJWT==2.8.0",
+            "PyJWT==2.9.0"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "worker: pass queue names by keyword",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 15,
+      "files": {
+        "app/worker.py": [
+          [
+            "        raw = _r.brpoplpush(QUEUE, PROCESSING, timeout=5)\n",
+            "        raw = _r.brpoplpush(src=PROCESSING, dst=QUEUE, timeout=5)\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 2,
+    "expected_runbook_id": null
+  }
+}

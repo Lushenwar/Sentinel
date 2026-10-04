@@ -1,0 +1,67 @@
+{
+  "id": "tmo_gateway_deadline_02",
+  "category": "latency_timeout",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_504_Gateway_Timeout",
+    "error_signature": "504 Gateway Timeout: POST /v1/orders exceeded upstream deadline (payments.charge p50 6.2s, unchanged)"
+  },
+  "commits": [
+    {
+      "message": "config: tighten edge deadline to meet p99 target",
+      "author": "p.nair@example.com",
+      "minutes_before_alert": 54,
+      "files": {
+        "config.json": [
+          [
+            "\"gateway\": {\"upstream_timeout_s\": 15}",
+            "\"gateway\": {\"upstream_timeout_s\": 5}"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "payments: send idempotency key with charges",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 40,
+      "files": {
+        "app/clients/payments.py": [
+          [
+            "        json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n",
+            "        json={\"order_id\": order_id, \"amount_cents\": amount_cents, \"card_token\": card_token},\n        headers={\"Idempotency-Key\": f\"charge-{order_id}\"},\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "orders: name the stock shortfall list",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 25,
+      "files": {
+        "app/handlers/orders.py": [
+          [
+            "    short = [line[\"sku\"] for line in lines if stock[line[\"sku\"]] < line[\"qty\"]]\n    if short:\n        return {\"status\": 409, \"body\": {\"error\": \"insufficient stock\", \"skus\": short}}\n",
+            "    shortfall = [line[\"sku\"] for line in lines if stock[line[\"sku\"]] < line[\"qty\"]]\n    if shortfall:\n        return {\"status\": 409, \"body\": {\"error\": \"insufficient stock\", \"skus\": shortfall}}\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "l.becker@example.com",
+      "minutes_before_alert": 11,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 0,
+    "expected_runbook_id": "request_timeouts"
+  }
+}

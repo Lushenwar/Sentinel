@@ -1,0 +1,71 @@
+{
+  "id": "auth_audience_rename_01",
+  "category": "auth_rejection",
+  "base": "orders_service",
+  "alert": {
+    "alert_name": "HTTP_401_Unauthorized_Spike",
+    "error_signature": "jwt.exceptions.InvalidAudienceError: Audience doesn't match"
+  },
+  "commits": [
+    {
+      "message": "auth: strip whitespace around bearer token",
+      "author": "j.silva@example.com",
+      "minutes_before_alert": 53,
+      "files": {
+        "app/auth.py": [
+          [
+            "    scheme, _, token = headers.get(\"authorization\", \"\").partition(\" \")\n",
+            "    scheme, _, token = headers.get(\"authorization\", \"\").strip().partition(\" \")\n    token = token.strip()\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "docs: local development notes",
+      "author": "m.okafor@example.com",
+      "minutes_before_alert": 37,
+      "files": {
+        "README.md": [
+          [
+            "(JSON-encoded)\n",
+            "(JSON-encoded)\n\n## Local development\n\n```\npip install -r requirements.txt\nORDERS_DB_HOST='\"localhost\"' python -m app.worker\n```\n"
+          ]
+        ]
+      }
+    },
+    {
+      "message": "config: align service identifiers with service catalog",
+      "author": "r.haddad@example.com",
+      "minutes_before_alert": 21,
+      "files": {
+        "config.json": [
+          [
+            "\"audience\": \"orders-api\"",
+            "\"audience\": \"orders\""
+          ]
+        ]
+      }
+    },
+    {
+      "message": "exports: include currency column",
+      "author": "a.chen@example.com",
+      "minutes_before_alert": 5,
+      "files": {
+        "app/exports.py": [
+          [
+            "writer.writerow([\"id\", \"status\", \"total\", \"created_at\"])",
+            "writer.writerow([\"id\", \"status\", \"total\", \"currency\", \"created_at\"])"
+          ],
+          [
+            "writer.writerow([o[\"id\"], o[\"status\"], o[\"total\"], o[\"created_at\"]])",
+            "writer.writerow([o[\"id\"], o[\"status\"], o[\"total\"], o[\"currency\"], o[\"created_at\"]])"
+          ]
+        ]
+      }
+    }
+  ],
+  "label": {
+    "culprit_index": 2,
+    "expected_runbook_id": "auth_failures"
+  }
+}
