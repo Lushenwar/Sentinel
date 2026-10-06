@@ -13,7 +13,7 @@ RUNBOOKS_DIR = os.path.join(REPO_PATH, "sandbox", "runbooks")
 _DEDUP_WINDOW_S = float(os.getenv("SENTINEL_DEDUP_WINDOW_S", "300"))
 _DEDUP_THRESHOLD = int(os.getenv("SENTINEL_DEDUP_THRESHOLD", "1"))  # Nth hit in window fires
 _recent_alerts: dict[str, list[float]] = defaultdict(list)  # signature -> hit times
-# Pass matched runbook text into commit ranking. Default off until the Phase 9 A/B decides (METRICS.md).
+# Pass matched runbook text into commit ranking. Off: Phase 9 A/B found no measurable benefit (ADR-7).
 _RAG_RANKING = os.getenv("SENTINEL_RAG_RANKING", "0") == "1"
 _open_signatures: dict[str, str] = {}  # signature -> live incident_id
 
