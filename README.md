@@ -84,6 +84,7 @@ Every hop reads and writes one auditable incident row conforming to
 ## Docs
 
 - [METRICS.md](METRICS.md) — measured end-to-end timings, methodology, and per-run results
+- Measured diagnostic accuracy: faulty commit ranked #1 in 90.3% of 72 trials across 24 injected-fault cases with decoy commits ([METRICS.md, Phase 9](METRICS.md#phase-9--diagnostic-accuracy-and-runbook-context-in-ranking))
 - [ADR.md](ADR.md) — why explicit state loops over LangChain, polling over WebSockets, Chroma over Pinecone, FastAPI over Flask, tool-call JSON over free-form parsing, sandbox over live infra
 
 ## Sandbox reference

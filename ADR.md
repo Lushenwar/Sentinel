@@ -104,3 +104,44 @@ Phase 5 verified 3/3 correct #1 rankings *because* ground truth exists.
 Trade-off: no exposure to messy production alert noise; the mitigation is that
 the simulation's log and alert shapes mirror production profiles (mock Sentry
 payloads, structured JSON logs).
+
+---
+
+## ADR-7: Runbook context in commit ranking — built, measured, left off
+
+**Context.** Sentinel already retrieved matching runbooks (Chroma, cosine
+similarity) but only used them in the postmortem and the Slack card. The open
+question was whether passing them into `rank_suspect_commits` would help
+Claude find the faulty commit. Two other retrieval targets were considered and
+rejected: **past incidents**, because a sandbox has too little history for
+retrieval over it to matter, and **diff embeddings**, because "what changed
+recently" is already answered exactly by the git time window.
+
+**Decision.** Runbook text (Symptoms + Root Causes, capped at 1500 chars) can
+be passed into the ranking prompt behind `SENTINEL_RAG_RANKING`, **default
+off**. Only runbooks scoring at or above `SENTINEL_RUNBOOK_FLOOR` (0.35) are
+sent; if none clear it, the block is omitted and the prompt is byte-identical
+to the no-runbook prompt (guarded by a golden-string test). The prompt tells
+the model runbooks may be irrelevant and that diffs are the evidence. Runbook
+text is never persisted. A retrieval failure is logged and ranking proceeds
+without runbooks.
+
+The floor was picked from the baseline's retrieval scores before any RAG run
+(maximise correct runbooks kept minus null cases given a runbook).
+
+**Measured result** (METRICS.md, Phase 9; 24 cases × 3 trials): baseline
+90.3% top-1, RAG 91.7%. On the 10 cases where runbook text actually reached the
+prompt, both scored 27/30; the single extra RAG hit came from a case whose
+prompt was unchanged. **No measurable benefit**, and no measurable harm on
+null-runbook cases.
+
+**Consequences.** The flag stays off, so the shipped ranking path is the
+measured baseline. The plumbing and the eval harness stay, because the answer
+depends on two things that could change:
+- **Retrieval quality.** The correct runbook is top-1 in only 10/17 cases, and
+  at the floor only 8/17 cases receive it. Better retrieval (richer alert text
+  than a one-line error, or a stronger embedding model) would raise the
+  ceiling on what runbooks can contribute.
+- **Baseline headroom.** At 90% top-1 there is little left to win. A larger,
+  harder or real incident corpus — especially real runbooks written by the
+  team that wrote the code — would be the test that could change this decision.
