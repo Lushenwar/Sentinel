@@ -40,7 +40,22 @@ def summarize(records: list[dict]) -> dict:
         "n_right": len(right),
         "n_wrong": len(wrong),
         "latency_median_s": statistics.median(r["rank_latency_s"] for r in records) if records else None,
+        # runs before token metering have no usage; report None rather than a fake zero
+        "tokens_in_mean": _mean_usage(records, "input_tokens"),
+        "tokens_out_mean": _mean_usage(records, "output_tokens"),
     }
+
+
+def _mean_usage(records: list[dict], key: str):
+    vals = [r["usage"][key] for r in records if r.get("usage")]
+    return round(statistics.mean(vals)) if vals else None
+
+
+def _label(a: dict, b: dict) -> tuple[str, str]:
+    """Name the two runs by whatever differs: condition for an A/B, model for a model comparison."""
+    if a["condition"] != b["condition"]:
+        return a["condition"], b["condition"]
+    return a["model"], b["model"]
 
 
 def retrieval(records: list[dict]) -> dict:
@@ -114,6 +129,8 @@ def print_summary(name: str, res: dict):
         f"wrong {_fmt_conf(s['conf_wrong'])} (n={s['n_wrong']})"
     )
     print(f"  rank latency median {s['latency_median_s']}s (n={s['n']})")
+    if s["tokens_in_mean"] is not None:
+        print(f"  tokens/call  in {s['tokens_in_mean']}, out {s['tokens_out_mean']} (mean)")
     if res.get("aborted"):
         print(f"  WARNING run ABORTED, not a valid measurement: {res['aborted']}")
     truncated = sorted({r["case_id"] for r in res["records"] if r["truncated_diffs"]})
@@ -137,20 +154,21 @@ def print_retrieval(res: dict):
 
 def print_comparison(a: dict, b: dict):
     rows = paired(a["records"], b["records"])
+    la, lb = _label(a, b)
     wins = sum(hb / tb > ha / ta for _, ha, ta, hb, tb in rows)
     losses = sum(hb / tb < ha / ta for _, ha, ta, hb, tb in rows)
-    print(f"\n== Paired per-case top-1 hits ({a['condition']} vs {b['condition']})")
-    print(f"  {'case':<34} {a['condition']:>9} {b['condition']:>9}")
+    print(f"\n== Paired per-case top-1 hits ({la} vs {lb})")
+    print(f"  {'case':<34} {la:>15} {lb:>15}")
     for cid, ha, ta, hb, tb in rows:
         mark = "+" if hb / tb > ha / ta else "-" if hb / tb < ha / ta else " "
-        print(f"  {cid:<34} {ha:>5}/{ta:<3} {hb:>5}/{tb:<3} {mark}")
+        print(f"  {cid:<34} {ha:>11}/{ta:<3} {hb:>11}/{tb:<3} {mark}")
     ties = len(rows) - wins - losses
-    print(f"  {b['condition']} wins {wins}, losses {losses}, ties {ties} (n={len(rows)} cases)")
+    print(f"  {lb} wins {wins}, losses {losses}, ties {ties} (n={len(rows)} cases)")
 
     print("\n== Null-runbook cases only (does irrelevant context hurt?)")
-    for res in (a, b):
+    for label, res in ((la, a), (lb, b)):
         s = summarize([r for r in res["records"] if not r["expected_runbook_id"]])
-        print(f"  {res['condition']:<9} top-1 {_pct(s['top1'], s['n'])}, MRR {s['mrr']:.3f}")
+        print(f"  {label:<15} top-1 {_pct(s['top1'], s['n'])}, MRR {s['mrr']:.3f}")
 
 
 def main(argv=None):

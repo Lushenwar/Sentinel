@@ -47,14 +47,24 @@ def run_trial(case: dict, condition: str) -> dict:
             "culprit_rank": None,
             "error": None,
         }
+        usage = {}
+        real_chat = llm_analyzer.chat
+
+        def metered_chat(*args, **kwargs):  # records token usage without touching production code
+            resp = real_chat(*args, **kwargs)
+            if getattr(resp, "usage", None):
+                usage.update(input_tokens=resp.usage.input_tokens, output_tokens=resp.usage.output_tokens)
+            return resp
+
         t0 = time.monotonic()
         try:
             # the harness never builds a prompt itself; it calls the production function
-            ranked = (
-                llm_analyzer.rank_suspect_commits(diffs, alert, runbooks=runbooks)
-                if rag
-                else llm_analyzer.rank_suspect_commits(diffs, alert)
-            )
+            with patch.object(llm_analyzer, "chat", metered_chat):
+                ranked = (
+                    llm_analyzer.rank_suspect_commits(diffs, alert, runbooks=runbooks)
+                    if rag
+                    else llm_analyzer.rank_suspect_commits(diffs, alert)
+                )
             record["ranking"] = [
                 {"commit_hash": r["commit_hash"][:7], "confidence_score": r["confidence_score"]}
                 for r in ranked
@@ -65,6 +75,7 @@ def run_trial(case: dict, condition: str) -> dict:
         except llm_analyzer.LLMUnavailable as e:
             record["error"] = f"LLMUnavailable: {e}"  # counted as a miss by report.py, never dropped
         record["rank_latency_s"] = round(time.monotonic() - t0, 2)
+        record["usage"] = usage or None
         return record
 
 
