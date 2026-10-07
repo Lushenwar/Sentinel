@@ -54,6 +54,11 @@ export default function IncidentDetail() {
         <div className="panel">
           <h2>Suspect commits</h2>
           {diagnostics.suspect_commits.length === 0 && <p>None found in the alert window.</p>}
+          {/* mirrors core/services/notifier.is_close_call: the gap to #2 predicts wrong picks, raw confidence doesn't */}
+          {diagnostics.suspect_commits.length >= 2 &&
+            Math.round((diagnostics.suspect_commits[0].confidence_score - diagnostics.suspect_commits[1].confidence_score) * 100) <= 10 && (
+              <p className="error-sig">Close call: the top two suspects are within 10 points. Check both.</p>
+            )}
           {diagnostics.suspect_commits.map((c) => (
             <div key={c.commit_hash} style={{ marginBottom: 12 }}>
               <p>
