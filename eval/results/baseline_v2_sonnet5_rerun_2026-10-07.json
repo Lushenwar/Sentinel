@@ -1,0 +1,3736 @@
+{
+  "condition": "baseline",
+  "dry_run": false,
+  "eval_set_version": "v2",
+  "runbook_corpus_version": "v1",
+  "runbooks_ingested": 10,
+  "runbook_floor": 0.35,
+  "model": "claude-sonnet-5",
+  "sentinel_git_sha": "dfd27973fd1c0e2bb514413e4e258782cc7b48fd",
+  "started_at": "2026-10-07T21:21:32.348350+00:00",
+  "trials": 3,
+  "n_cases": 24,
+  "records": [
+    {
+      "trial": 0,
+      "case_id": "auth_issuer_mesh_hosts",
+      "category": "auth_rejection",
+      "culprit_hash": "5e68f8a",
+      "expected_runbook_id": "auth_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.317
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.245
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.236
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "5e68f8a",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "45a24d5",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "df0ec4c",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "298be8d",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "d20025a",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 8.81,
+      "usage": {
+        "input_tokens": 3108,
+        "output_tokens": 701
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "cache_contains_recursion",
+      "category": "infinite_recursion",
+      "culprit_hash": "4584056",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.333
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.31
+        },
+        {
+          "id": "db_failures",
+          "similarity_score": 0.233
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "4584056",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "6484609",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "6cc141a",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "7e63ea3",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "a98de00",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.22,
+      "usage": {
+        "input_tokens": 2900,
+        "output_tokens": 659
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "cart_price_field_v2",
+      "category": "null_or_missing_field",
+      "culprit_hash": "d0ab213",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.26
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.207
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.179
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "d0ab213",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "73e1933",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "4fbde4c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "2bbbf3f",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "f618f59",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.17,
+      "usage": {
+        "input_tokens": 3034,
+        "output_tokens": 707
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "cart_sku_lowercased",
+      "category": "identifier_format",
+      "culprit_hash": "c2ec824",
+      "expected_runbook_id": null,
+      "commits_in_window": 4,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.293
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.247
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.229
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "c2ec824",
+          "confidence_score": 0.75
+        },
+        {
+          "commit_hash": "64dde29",
+          "confidence_score": 0.4
+        },
+        {
+          "commit_hash": "91f8d36",
+          "confidence_score": 0.0
+        },
+        {
+          "commit_hash": "d0cb0b3",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.08,
+      "usage": {
+        "input_tokens": 2555,
+        "output_tokens": 643
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "checkout_deadline_extra_call",
+      "category": "latency_timeout",
+      "culprit_hash": "efebc07",
+      "expected_runbook_id": "request_timeouts",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.487
+        },
+        {
+          "id": "db_failures",
+          "similarity_score": 0.369
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.353
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "efebc07",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "a035477",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "2b765f4",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "be85cc9",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "91b8b07",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.59,
+      "usage": {
+        "input_tokens": 3255,
+        "output_tokens": 626
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "config_reformat_hidden_string",
+      "category": "config_type_error",
+      "culprit_hash": "c3629ef",
+      "expected_runbook_id": "config_parse_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.246
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.19
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.184
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "c3629ef",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "3af442c",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "a6a3c41",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "976c988",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "89436d3",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.53,
+      "usage": {
+        "input_tokens": 3170,
+        "output_tokens": 685
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "db_fetch_one_leak",
+      "category": "db_pool_exhaustion",
+      "culprit_hash": "af9b861",
+      "expected_runbook_id": "db_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "db_failures",
+          "similarity_score": 0.631
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.35
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.28
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "af9b861",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "f46cd8c",
+          "confidence_score": 0.4
+        },
+        {
+          "commit_hash": "1618815",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "6d50d20",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "1bf1024",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.42,
+      "usage": {
+        "input_tokens": 3161,
+        "output_tokens": 679
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "export_tempfile_never_closed",
+      "category": "file_handle_leak",
+      "culprit_hash": "6eea0fc",
+      "expected_runbook_id": "file_handle_exhaustion",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.625
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.432
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.291
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "6eea0fc",
+          "confidence_score": 0.8
+        },
+        {
+          "commit_hash": "5cedb21",
+          "confidence_score": 0.75
+        },
+        {
+          "commit_hash": "b245524",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "0be651d",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "7453733",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.56,
+      "usage": {
+        "input_tokens": 3504,
+        "output_tokens": 687
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "guest_email_normalise",
+      "category": "null_or_missing_field",
+      "culprit_hash": "7dd25fe",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.241
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.208
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.161
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "7dd25fe",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "9519064",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "1c0135b",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "30a7434",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "cde392a",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.8,
+      "usage": {
+        "input_tokens": 2902,
+        "output_tokens": 737
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "httpx_028_drops_proxies",
+      "category": "dependency_version",
+      "culprit_hash": "b35322f",
+      "expected_runbook_id": "dependency_regressions",
+      "commits_in_window": 4,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.294
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.285
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.263
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "741f699",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "b35322f",
+          "confidence_score": 0.8
+        },
+        {
+          "commit_hash": "b45189f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "e3601f6",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 2,
+      "error": null,
+      "rank_latency_s": 4.88,
+      "usage": {
+        "input_tokens": 2773,
+        "output_tokens": 534
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "inventory_cache_key_per_request",
+      "category": "rate_limit_429",
+      "culprit_hash": "526f8dd",
+      "expected_runbook_id": "rate_limiting",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.382
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.381
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.309
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "526f8dd",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "bf4cc5f",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "93320f2",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "2e1b06b",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "d9caa65",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.41,
+      "usage": {
+        "input_tokens": 3344,
+        "output_tokens": 759
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "inventory_v3_payload",
+      "category": "null_or_missing_field",
+      "culprit_hash": "1c29d94",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.33
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.281
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.28
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "1c29d94",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "c6f0797",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "16d2191",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "5823d1f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "fb9b710",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.73,
+      "usage": {
+        "input_tokens": 3259,
+        "output_tokens": 615
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "jwt_leeway_milliseconds",
+      "category": "auth_rejection",
+      "culprit_hash": "2eeb222",
+      "expected_runbook_id": "auth_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.488
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.198
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.159
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "2eeb222",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "e8548c5",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "2e11931",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "a028c62",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "716e22d",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 8.55,
+      "usage": {
+        "input_tokens": 3060,
+        "output_tokens": 644
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "money_returns_decimal",
+      "category": "json_serialization",
+      "culprit_hash": "b14897b",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.298
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.151
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.13
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "b14897b",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "dedc41a",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "626c22d",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "cd4a49f",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "92cb3da",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.42,
+      "usage": {
+        "input_tokens": 2971,
+        "output_tokens": 667
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "order_read_sync_audit",
+      "category": "latency_timeout",
+      "culprit_hash": "8aed86c",
+      "expected_runbook_id": "request_timeouts",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.539
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.369
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.35
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "8aed86c",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "94578cc",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "d3d6f87",
+          "confidence_score": 0.5
+        },
+        {
+          "commit_hash": "5abe2e4",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "b7ea08d",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.56,
+      "usage": {
+        "input_tokens": 3260,
+        "output_tokens": 790
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "order_sql_missing_param",
+      "category": "sql_param_mismatch",
+      "culprit_hash": "9ef79b2",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.322
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.23
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.196
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "9ef79b2",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "661f871",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "93ebe2f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "66d5f2f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "411ddfa",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.14,
+      "usage": {
+        "input_tokens": 3174,
+        "output_tokens": 656
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "page_size_zero_division",
+      "category": "pagination_boundary",
+      "culprit_hash": "6265f24",
+      "expected_runbook_id": "pagination_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.146
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.129
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.127
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "6265f24",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "ed3861b",
+          "confidence_score": 0.8
+        },
+        {
+          "commit_hash": "0d241ff",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "ef48acf",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "debe268",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.86,
+      "usage": {
+        "input_tokens": 2930,
+        "output_tokens": 641
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "payments_body_without_content_type",
+      "category": "http_content_type",
+      "culprit_hash": "33a9e2a",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.274
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.164
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.143
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "33a9e2a",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "e60edf2",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "5430f37",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "91f3040",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "64ee5a8",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.06,
+      "usage": {
+        "input_tokens": 3442,
+        "output_tokens": 555
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "payments_retry_loop",
+      "category": "rate_limit_429",
+      "culprit_hash": "f07e927",
+      "expected_runbook_id": "rate_limiting",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.357
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.352
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.323
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f07e927",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "07a85f8",
+          "confidence_score": 0.8
+        },
+        {
+          "commit_hash": "c1fc55f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "51bc043",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "429c4dd",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.36,
+      "usage": {
+        "input_tokens": 3376,
+        "output_tokens": 691
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "redis_legacy_lrem_args",
+      "category": "dependency_version",
+      "culprit_hash": "0751831",
+      "expected_runbook_id": "dependency_regressions",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.324
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.317
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.269
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "0751831",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "fd92e84",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "3059910",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "7b9dd2c",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "957a42e",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.86,
+      "usage": {
+        "input_tokens": 2647,
+        "output_tokens": 724
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "settings_env_quotes",
+      "category": "config_type_error",
+      "culprit_hash": "15aba07",
+      "expected_runbook_id": "config_parse_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "db_failures",
+          "similarity_score": 0.36
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.278
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.241
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "15aba07",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "cae9a6c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "423c51f",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "3e36aa4",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "55cfa0d",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.53,
+      "usage": {
+        "input_tokens": 2831,
+        "output_tokens": 718
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "since_filter_naive_cutoff",
+      "category": "timezone_mismatch",
+      "culprit_hash": "266c09c",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.279
+        },
+        {
+          "id": "dependency_regressions",
+          "similarity_score": 0.224
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.215
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "266c09c",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "f3ad8b7",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "7f71cc9",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "ef6b4a1",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "5948e6d",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.42,
+      "usage": {
+        "input_tokens": 3051,
+        "output_tokens": 615
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "worker_queue_renamed",
+      "category": "queue_stall",
+      "culprit_hash": "f8d8258",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.411
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.409
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.383
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f8d8258",
+          "confidence_score": 0.92
+        },
+        {
+          "commit_hash": "0f497ec",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "110eec6",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "aacbcd7",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "3434d6b",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.64,
+      "usage": {
+        "input_tokens": 2774,
+        "output_tokens": 665
+      }
+    },
+    {
+      "trial": 0,
+      "case_id": "worker_retains_job_payloads",
+      "category": "memory_growth",
+      "culprit_hash": "3037583",
+      "expected_runbook_id": "memory_leaks",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.48
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.478
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.424
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "3037583",
+          "confidence_score": 0.96
+        },
+        {
+          "commit_hash": "088e964",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "947ac52",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "15f34e0",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "63c2633",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.91,
+      "usage": {
+        "input_tokens": 3095,
+        "output_tokens": 614
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "auth_issuer_mesh_hosts",
+      "category": "auth_rejection",
+      "culprit_hash": "5e68f8a",
+      "expected_runbook_id": "auth_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.317
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.245
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.236
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "5e68f8a",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "45a24d5",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "df0ec4c",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "298be8d",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "d20025a",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.2,
+      "usage": {
+        "input_tokens": 3108,
+        "output_tokens": 691
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "cache_contains_recursion",
+      "category": "infinite_recursion",
+      "culprit_hash": "4584056",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.333
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.31
+        },
+        {
+          "id": "db_failures",
+          "similarity_score": 0.233
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "4584056",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "6484609",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "7e63ea3",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "6cc141a",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "a98de00",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.27,
+      "usage": {
+        "input_tokens": 2900,
+        "output_tokens": 580
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "cart_price_field_v2",
+      "category": "null_or_missing_field",
+      "culprit_hash": "d0ab213",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.26
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.207
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.179
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "d0ab213",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "73e1933",
+          "confidence_score": 0.35
+        },
+        {
+          "commit_hash": "4fbde4c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "2bbbf3f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "f618f59",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.55,
+      "usage": {
+        "input_tokens": 3034,
+        "output_tokens": 729
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "cart_sku_lowercased",
+      "category": "identifier_format",
+      "culprit_hash": "c2ec824",
+      "expected_runbook_id": null,
+      "commits_in_window": 4,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.293
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.247
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.229
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "c2ec824",
+          "confidence_score": 0.6
+        },
+        {
+          "commit_hash": "64dde29",
+          "confidence_score": 0.35
+        },
+        {
+          "commit_hash": "d0cb0b3",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "91f8d36",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.52,
+      "usage": {
+        "input_tokens": 2555,
+        "output_tokens": 559
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "checkout_deadline_extra_call",
+      "category": "latency_timeout",
+      "culprit_hash": "efebc07",
+      "expected_runbook_id": "request_timeouts",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.487
+        },
+        {
+          "id": "db_failures",
+          "similarity_score": 0.369
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.353
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "efebc07",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "a035477",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "2b765f4",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "be85cc9",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "91b8b07",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.73,
+      "usage": {
+        "input_tokens": 3255,
+        "output_tokens": 707
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "config_reformat_hidden_string",
+      "category": "config_type_error",
+      "culprit_hash": "c3629ef",
+      "expected_runbook_id": "config_parse_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.246
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.19
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.184
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "c3629ef",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "3af442c",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "a6a3c41",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "976c988",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "89436d3",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.75,
+      "usage": {
+        "input_tokens": 3170,
+        "output_tokens": 732
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "db_fetch_one_leak",
+      "category": "db_pool_exhaustion",
+      "culprit_hash": "af9b861",
+      "expected_runbook_id": "db_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "db_failures",
+          "similarity_score": 0.631
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.35
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.28
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "af9b861",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "f46cd8c",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "1618815",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "6d50d20",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "1bf1024",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.84,
+      "usage": {
+        "input_tokens": 3161,
+        "output_tokens": 749
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "export_tempfile_never_closed",
+      "category": "file_handle_leak",
+      "culprit_hash": "6eea0fc",
+      "expected_runbook_id": "file_handle_exhaustion",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.625
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.432
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.291
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "5cedb21",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "6eea0fc",
+          "confidence_score": 0.35
+        },
+        {
+          "commit_hash": "b245524",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "0be651d",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "7453733",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 2,
+      "error": null,
+      "rank_latency_s": 6.72,
+      "usage": {
+        "input_tokens": 3504,
+        "output_tokens": 656
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "guest_email_normalise",
+      "category": "null_or_missing_field",
+      "culprit_hash": "7dd25fe",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.241
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.208
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.161
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "7dd25fe",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "9519064",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "30a7434",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "1c0135b",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "cde392a",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.81,
+      "usage": {
+        "input_tokens": 2902,
+        "output_tokens": 635
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "httpx_028_drops_proxies",
+      "category": "dependency_version",
+      "culprit_hash": "b35322f",
+      "expected_runbook_id": "dependency_regressions",
+      "commits_in_window": 4,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.294
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.285
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.263
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "741f699",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "b35322f",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "b45189f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "e3601f6",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 2,
+      "error": null,
+      "rank_latency_s": 5.02,
+      "usage": {
+        "input_tokens": 2773,
+        "output_tokens": 549
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "inventory_cache_key_per_request",
+      "category": "rate_limit_429",
+      "culprit_hash": "526f8dd",
+      "expected_runbook_id": "rate_limiting",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.382
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.381
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.309
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "526f8dd",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "bf4cc5f",
+          "confidence_score": 0.35
+        },
+        {
+          "commit_hash": "93320f2",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "2e1b06b",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "d9caa65",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.5,
+      "usage": {
+        "input_tokens": 3344,
+        "output_tokens": 598
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "inventory_v3_payload",
+      "category": "null_or_missing_field",
+      "culprit_hash": "1c29d94",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.33
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.281
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.28
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "1c29d94",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "c6f0797",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "16d2191",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "5823d1f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "fb9b710",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.28,
+      "usage": {
+        "input_tokens": 3259,
+        "output_tokens": 624
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "jwt_leeway_milliseconds",
+      "category": "auth_rejection",
+      "culprit_hash": "2eeb222",
+      "expected_runbook_id": "auth_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.488
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.198
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.159
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "2eeb222",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "e8548c5",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "2e11931",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "a028c62",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "716e22d",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.52,
+      "usage": {
+        "input_tokens": 3060,
+        "output_tokens": 703
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "money_returns_decimal",
+      "category": "json_serialization",
+      "culprit_hash": "b14897b",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.298
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.151
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.13
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "b14897b",
+          "confidence_score": 0.98
+        },
+        {
+          "commit_hash": "dedc41a",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "626c22d",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "cd4a49f",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "92cb3da",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.64,
+      "usage": {
+        "input_tokens": 2971,
+        "output_tokens": 614
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "order_read_sync_audit",
+      "category": "latency_timeout",
+      "culprit_hash": "8aed86c",
+      "expected_runbook_id": "request_timeouts",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.539
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.369
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.35
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "8aed86c",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "d3d6f87",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "94578cc",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "5abe2e4",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "b7ea08d",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.17,
+      "usage": {
+        "input_tokens": 3260,
+        "output_tokens": 765
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "order_sql_missing_param",
+      "category": "sql_param_mismatch",
+      "culprit_hash": "9ef79b2",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.322
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.23
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.196
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "9ef79b2",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "661f871",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "93ebe2f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "66d5f2f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "411ddfa",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.67,
+      "usage": {
+        "input_tokens": 3174,
+        "output_tokens": 684
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "page_size_zero_division",
+      "category": "pagination_boundary",
+      "culprit_hash": "6265f24",
+      "expected_runbook_id": "pagination_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.146
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.129
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.127
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "6265f24",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "ed3861b",
+          "confidence_score": 0.8
+        },
+        {
+          "commit_hash": "0d241ff",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "ef48acf",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "debe268",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.73,
+      "usage": {
+        "input_tokens": 2930,
+        "output_tokens": 613
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "payments_body_without_content_type",
+      "category": "http_content_type",
+      "culprit_hash": "33a9e2a",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.274
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.164
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.143
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "33a9e2a",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "e60edf2",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "91f3040",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "5430f37",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "64ee5a8",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.25,
+      "usage": {
+        "input_tokens": 3442,
+        "output_tokens": 599
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "payments_retry_loop",
+      "category": "rate_limit_429",
+      "culprit_hash": "f07e927",
+      "expected_runbook_id": "rate_limiting",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.357
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.352
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.323
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f07e927",
+          "confidence_score": 0.8
+        },
+        {
+          "commit_hash": "07a85f8",
+          "confidence_score": 0.75
+        },
+        {
+          "commit_hash": "c1fc55f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "429c4dd",
+          "confidence_score": 0.0
+        },
+        {
+          "commit_hash": "51bc043",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.72,
+      "usage": {
+        "input_tokens": 3376,
+        "output_tokens": 590
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "redis_legacy_lrem_args",
+      "category": "dependency_version",
+      "culprit_hash": "0751831",
+      "expected_runbook_id": "dependency_regressions",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.324
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.317
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.269
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "0751831",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "3059910",
+          "confidence_score": 0.45
+        },
+        {
+          "commit_hash": "fd92e84",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "7b9dd2c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "957a42e",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.59,
+      "usage": {
+        "input_tokens": 2647,
+        "output_tokens": 686
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "settings_env_quotes",
+      "category": "config_type_error",
+      "culprit_hash": "15aba07",
+      "expected_runbook_id": "config_parse_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "db_failures",
+          "similarity_score": 0.36
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.278
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.241
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "15aba07",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "cae9a6c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "423c51f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "3e36aa4",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "55cfa0d",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.06,
+      "usage": {
+        "input_tokens": 2831,
+        "output_tokens": 733
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "since_filter_naive_cutoff",
+      "category": "timezone_mismatch",
+      "culprit_hash": "266c09c",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.279
+        },
+        {
+          "id": "dependency_regressions",
+          "similarity_score": 0.224
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.215
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "266c09c",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "f3ad8b7",
+          "confidence_score": 0.6
+        },
+        {
+          "commit_hash": "7f71cc9",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "ef6b4a1",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "5948e6d",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.44,
+      "usage": {
+        "input_tokens": 3051,
+        "output_tokens": 714
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "worker_queue_renamed",
+      "category": "queue_stall",
+      "culprit_hash": "f8d8258",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.411
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.409
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.383
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f8d8258",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "0f497ec",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "110eec6",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "aacbcd7",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "3434d6b",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.39,
+      "usage": {
+        "input_tokens": 2774,
+        "output_tokens": 729
+      }
+    },
+    {
+      "trial": 1,
+      "case_id": "worker_retains_job_payloads",
+      "category": "memory_growth",
+      "culprit_hash": "3037583",
+      "expected_runbook_id": "memory_leaks",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.48
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.478
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.424
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "3037583",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "088e964",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "947ac52",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "15f34e0",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "63c2633",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.69,
+      "usage": {
+        "input_tokens": 3095,
+        "output_tokens": 594
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "auth_issuer_mesh_hosts",
+      "category": "auth_rejection",
+      "culprit_hash": "5e68f8a",
+      "expected_runbook_id": "auth_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.317
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.245
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.236
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "5e68f8a",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "45a24d5",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "df0ec4c",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "298be8d",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "d20025a",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.62,
+      "usage": {
+        "input_tokens": 3108,
+        "output_tokens": 677
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "cache_contains_recursion",
+      "category": "infinite_recursion",
+      "culprit_hash": "4584056",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.333
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.31
+        },
+        {
+          "id": "db_failures",
+          "similarity_score": 0.233
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "4584056",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "6484609",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "7e63ea3",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "6cc141a",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "a98de00",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.5,
+      "usage": {
+        "input_tokens": 2900,
+        "output_tokens": 538
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "cart_price_field_v2",
+      "category": "null_or_missing_field",
+      "culprit_hash": "d0ab213",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.26
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.207
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.179
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "d0ab213",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "73e1933",
+          "confidence_score": 0.4
+        },
+        {
+          "commit_hash": "4fbde4c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "2bbbf3f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "f618f59",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.62,
+      "usage": {
+        "input_tokens": 3034,
+        "output_tokens": 729
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "cart_sku_lowercased",
+      "category": "identifier_format",
+      "culprit_hash": "c2ec824",
+      "expected_runbook_id": null,
+      "commits_in_window": 4,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.293
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.247
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.229
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "c2ec824",
+          "confidence_score": 0.6
+        },
+        {
+          "commit_hash": "64dde29",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "d0cb0b3",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "91f8d36",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.06,
+      "usage": {
+        "input_tokens": 2555,
+        "output_tokens": 621
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "checkout_deadline_extra_call",
+      "category": "latency_timeout",
+      "culprit_hash": "efebc07",
+      "expected_runbook_id": "request_timeouts",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.487
+        },
+        {
+          "id": "db_failures",
+          "similarity_score": 0.369
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.353
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "efebc07",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "a035477",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "2b765f4",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "be85cc9",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "91b8b07",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.67,
+      "usage": {
+        "input_tokens": 3255,
+        "output_tokens": 689
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "config_reformat_hidden_string",
+      "category": "config_type_error",
+      "culprit_hash": "c3629ef",
+      "expected_runbook_id": "config_parse_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.246
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.19
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.184
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "c3629ef",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "3af442c",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "976c988",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "a6a3c41",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "89436d3",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.41,
+      "usage": {
+        "input_tokens": 3170,
+        "output_tokens": 700
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "db_fetch_one_leak",
+      "category": "db_pool_exhaustion",
+      "culprit_hash": "af9b861",
+      "expected_runbook_id": "db_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "db_failures",
+          "similarity_score": 0.631
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.35
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.28
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "af9b861",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "f46cd8c",
+          "confidence_score": 0.5
+        },
+        {
+          "commit_hash": "1618815",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "6d50d20",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "1bf1024",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.77,
+      "usage": {
+        "input_tokens": 3161,
+        "output_tokens": 649
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "export_tempfile_never_closed",
+      "category": "file_handle_leak",
+      "culprit_hash": "6eea0fc",
+      "expected_runbook_id": "file_handle_exhaustion",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.625
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.432
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.291
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "5cedb21",
+          "confidence_score": 0.55
+        },
+        {
+          "commit_hash": "6eea0fc",
+          "confidence_score": 0.5
+        },
+        {
+          "commit_hash": "b245524",
+          "confidence_score": 0.3
+        },
+        {
+          "commit_hash": "0be651d",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "7453733",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 2,
+      "error": null,
+      "rank_latency_s": 7.12,
+      "usage": {
+        "input_tokens": 3504,
+        "output_tokens": 695
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "guest_email_normalise",
+      "category": "null_or_missing_field",
+      "culprit_hash": "7dd25fe",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.241
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.208
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.161
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "7dd25fe",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "9519064",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "1c0135b",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "30a7434",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "cde392a",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.62,
+      "usage": {
+        "input_tokens": 2902,
+        "output_tokens": 647
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "httpx_028_drops_proxies",
+      "category": "dependency_version",
+      "culprit_hash": "b35322f",
+      "expected_runbook_id": "dependency_regressions",
+      "commits_in_window": 4,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.294
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.285
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.263
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "741f699",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "b35322f",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "b45189f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "e3601f6",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 2,
+      "error": null,
+      "rank_latency_s": 5.19,
+      "usage": {
+        "input_tokens": 2773,
+        "output_tokens": 555
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "inventory_cache_key_per_request",
+      "category": "rate_limit_429",
+      "culprit_hash": "526f8dd",
+      "expected_runbook_id": "rate_limiting",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.382
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.381
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.309
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "526f8dd",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "bf4cc5f",
+          "confidence_score": 0.45
+        },
+        {
+          "commit_hash": "93320f2",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "2e1b06b",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "d9caa65",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.16,
+      "usage": {
+        "input_tokens": 3344,
+        "output_tokens": 747
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "inventory_v3_payload",
+      "category": "null_or_missing_field",
+      "culprit_hash": "1c29d94",
+      "expected_runbook_id": "null_field_handling",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.33
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.281
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.28
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "1c29d94",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "c6f0797",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "16d2191",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "5823d1f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "fb9b710",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.52,
+      "usage": {
+        "input_tokens": 3259,
+        "output_tokens": 575
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "jwt_leeway_milliseconds",
+      "category": "auth_rejection",
+      "culprit_hash": "2eeb222",
+      "expected_runbook_id": "auth_failures",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.488
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.198
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.159
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "2eeb222",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "2e11931",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "e8548c5",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "a028c62",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "716e22d",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.8,
+      "usage": {
+        "input_tokens": 3060,
+        "output_tokens": 709
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "money_returns_decimal",
+      "category": "json_serialization",
+      "culprit_hash": "b14897b",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.298
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.151
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.13
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "b14897b",
+          "confidence_score": 0.97
+        },
+        {
+          "commit_hash": "dedc41a",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "626c22d",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "cd4a49f",
+          "confidence_score": 0.01
+        },
+        {
+          "commit_hash": "92cb3da",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.31,
+      "usage": {
+        "input_tokens": 2971,
+        "output_tokens": 721
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "order_read_sync_audit",
+      "category": "latency_timeout",
+      "culprit_hash": "8aed86c",
+      "expected_runbook_id": "request_timeouts",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.539
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.369
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.35
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "8aed86c",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "d3d6f87",
+          "confidence_score": 0.4
+        },
+        {
+          "commit_hash": "94578cc",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "5abe2e4",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "b7ea08d",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 7.0,
+      "usage": {
+        "input_tokens": 3260,
+        "output_tokens": 794
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "order_sql_missing_param",
+      "category": "sql_param_mismatch",
+      "culprit_hash": "9ef79b2",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.322
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.23
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.196
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "9ef79b2",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "661f871",
+          "confidence_score": 0.2
+        },
+        {
+          "commit_hash": "93ebe2f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "66d5f2f",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "411ddfa",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.53,
+      "usage": {
+        "input_tokens": 3174,
+        "output_tokens": 681
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "page_size_zero_division",
+      "category": "pagination_boundary",
+      "culprit_hash": "6265f24",
+      "expected_runbook_id": "pagination_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.146
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.129
+        },
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.127
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "6265f24",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "ed3861b",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "0d241ff",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "ef48acf",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "debe268",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.61,
+      "usage": {
+        "input_tokens": 2930,
+        "output_tokens": 649
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "payments_body_without_content_type",
+      "category": "http_content_type",
+      "culprit_hash": "33a9e2a",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.274
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.164
+        },
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.143
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "33a9e2a",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "e60edf2",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "91f3040",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "5430f37",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "64ee5a8",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.28,
+      "usage": {
+        "input_tokens": 3442,
+        "output_tokens": 559
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "payments_retry_loop",
+      "category": "rate_limit_429",
+      "culprit_hash": "f07e927",
+      "expected_runbook_id": "rate_limiting",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.357
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.352
+        },
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.323
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f07e927",
+          "confidence_score": 0.6
+        },
+        {
+          "commit_hash": "07a85f8",
+          "confidence_score": 0.35
+        },
+        {
+          "commit_hash": "c1fc55f",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "429c4dd",
+          "confidence_score": 0.0
+        },
+        {
+          "commit_hash": "51bc043",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.06,
+      "usage": {
+        "input_tokens": 3376,
+        "output_tokens": 601
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "redis_legacy_lrem_args",
+      "category": "dependency_version",
+      "culprit_hash": "0751831",
+      "expected_runbook_id": "dependency_regressions",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "null_field_handling",
+          "similarity_score": 0.324
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.317
+        },
+        {
+          "id": "auth_failures",
+          "similarity_score": 0.269
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "0751831",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "3059910",
+          "confidence_score": 0.4
+        },
+        {
+          "commit_hash": "fd92e84",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "7b9dd2c",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "957a42e",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.5,
+      "usage": {
+        "input_tokens": 2647,
+        "output_tokens": 660
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "settings_env_quotes",
+      "category": "config_type_error",
+      "culprit_hash": "15aba07",
+      "expected_runbook_id": "config_parse_errors",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "db_failures",
+          "similarity_score": 0.36
+        },
+        {
+          "id": "config_parse_errors",
+          "similarity_score": 0.278
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.241
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "15aba07",
+          "confidence_score": 0.9
+        },
+        {
+          "commit_hash": "cae9a6c",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "423c51f",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "3e36aa4",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "55cfa0d",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.88,
+      "usage": {
+        "input_tokens": 2831,
+        "output_tokens": 753
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "since_filter_naive_cutoff",
+      "category": "timezone_mismatch",
+      "culprit_hash": "266c09c",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "pagination_errors",
+          "similarity_score": 0.279
+        },
+        {
+          "id": "dependency_regressions",
+          "similarity_score": 0.224
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.215
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f3ad8b7",
+          "confidence_score": 0.85
+        },
+        {
+          "commit_hash": "266c09c",
+          "confidence_score": 0.6
+        },
+        {
+          "commit_hash": "7f71cc9",
+          "confidence_score": 0.1
+        },
+        {
+          "commit_hash": "ef6b4a1",
+          "confidence_score": 0.02
+        },
+        {
+          "commit_hash": "5948e6d",
+          "confidence_score": 0.02
+        }
+      ],
+      "culprit_rank": 2,
+      "error": null,
+      "rank_latency_s": 7.41,
+      "usage": {
+        "input_tokens": 3051,
+        "output_tokens": 730
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "worker_queue_renamed",
+      "category": "queue_stall",
+      "culprit_hash": "f8d8258",
+      "expected_runbook_id": null,
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "request_timeouts",
+          "similarity_score": 0.411
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.409
+        },
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.383
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "f8d8258",
+          "confidence_score": 0.92
+        },
+        {
+          "commit_hash": "0f497ec",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "110eec6",
+          "confidence_score": 0.05
+        },
+        {
+          "commit_hash": "aacbcd7",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "3434d6b",
+          "confidence_score": 0.01
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 6.36,
+      "usage": {
+        "input_tokens": 2774,
+        "output_tokens": 733
+      }
+    },
+    {
+      "trial": 2,
+      "case_id": "worker_retains_job_payloads",
+      "category": "memory_growth",
+      "culprit_hash": "3037583",
+      "expected_runbook_id": "memory_leaks",
+      "commits_in_window": 5,
+      "truncated_diffs": 0,
+      "retrieved_runbooks": [
+        {
+          "id": "file_handle_exhaustion",
+          "similarity_score": 0.48
+        },
+        {
+          "id": "memory_leaks",
+          "similarity_score": 0.478
+        },
+        {
+          "id": "rate_limiting",
+          "similarity_score": 0.424
+        }
+      ],
+      "ranking": [
+        {
+          "commit_hash": "3037583",
+          "confidence_score": 0.95
+        },
+        {
+          "commit_hash": "947ac52",
+          "confidence_score": 0.25
+        },
+        {
+          "commit_hash": "088e964",
+          "confidence_score": 0.15
+        },
+        {
+          "commit_hash": "15f34e0",
+          "confidence_score": 0.03
+        },
+        {
+          "commit_hash": "63c2633",
+          "confidence_score": 0.0
+        }
+      ],
+      "culprit_rank": 1,
+      "error": null,
+      "rank_latency_s": 5.33,
+      "usage": {
+        "input_tokens": 3095,
+        "output_tokens": 593
+      }
+    }
+  ],
+  "finished_at": "2026-10-07T21:33:51.939699+00:00"
+}
