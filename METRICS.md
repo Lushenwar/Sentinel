@@ -188,3 +188,42 @@ the signal does not catch confidently wrong rankings.
 - Sandbox repo; each case's diffs are small and fit the 3000-char truncation.
 - The baseline is already 90% top-1, leaving little room for runbook context to
   help; retrieval only delivers the right runbook in about half the cases.
+
+## Model comparison and re-run (2026-10-07)
+
+Same eval set v2, no runbooks, 24 cases × 3 trials per model. Raw results:
+`eval/results/baseline_v2_sonnet5_rerun_2026-10-07.json` and
+`eval/results/baseline_v2_haiku45_2026-10-07.json`; reproduce with
+`python -m eval.report <sonnet file> <haiku file>`.
+
+| Metric | Claude Sonnet 5 (re-run) | Claude Haiku 4.5 |
+|---|---|---|
+| Top-1 | **91.7% (66/72)** | 80.6% (58/72) |
+| Top-3 | 100% | 100% |
+| MRR | 0.958 | 0.903 |
+| Null-runbook cases top-1 | 20/21 | 18/21 |
+| Ranking latency, median | 6.5s | 4.5s |
+| Tokens per call, mean (in / out) | 3066 / 665 | 2698 / 536 |
+| Cost per ranking call, list price | ~$0.013 | ~$0.005 |
+
+- **Stability:** the Sonnet 5 re-run (91.7%) matches the Phase 9 baseline
+  (90.3%) within one trial, so the 90% figure is not a lucky run.
+- **Haiku 4.5 is ~2.4x cheaper and ~2s faster per ranking but 11 points less
+  accurate** (paired: 2 case wins, 5 losses, 17 ties). Its losses include
+  `config_reformat_hidden_string` and `worker_queue_renamed` (0/3 each), the
+  cases where the decoy is most surface-plausible. At ~$0.013 per incident
+  the accuracy is worth more than the saving, so **Sonnet 5 stays the
+  default**. `SENTINEL_MODEL` makes the choice configurable.
+- Haiku 4.5 runs without extended thinking by default, while Sonnet 5 thinks
+  adaptively; this compares the models as shipped by default, not at matched
+  reasoning effort.
+- Costs use list prices ($2/$10 per MTok for Sonnet 5, $1/$5 for Haiku 4.5)
+  times the metered tokens, for the ranking call only (the postmortem is a
+  separate call).
+
+**Close-call rule, out of sample.** The 0.1 rule was chosen on the Phase 9
+trials. On the fresh Sonnet 5 re-run it flags **4/6 wrong picks with 7/66
+false alarms** (in-sample it was 9/13 and 9/131), so it holds. On Haiku 4.5 it
+flags 7/14 wrong but 22/58 right picks, and Haiku's raw confidence is identical
+for right and wrong picks (0.93 / 0.93): the rule is calibrated for Sonnet 5
+and should be re-checked if the model changes.
