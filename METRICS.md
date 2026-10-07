@@ -154,6 +154,22 @@ only 10 cases where the prompt differs, a real effect would need to show up as
 several (roughly 3+) net case wins concentrated in those cases. This is a
 judgement from the observed noise, not a significance test; none was computed.
 
+### Confidence signal
+
+Pooling both v2 conditions (144 trials: 131 right #1 picks, 13 wrong):
+
+| Signal | AUC right-vs-wrong (0.5 = coin flip) |
+|---|---|
+| Top-1 `confidence_score` | 0.60 |
+| Gap between #1 and #2 confidence | **0.86** |
+
+Raw confidence is near-useless: wrong picks averaged 0.83–0.89. The Slack card
+and dashboard therefore flag a **close call** when the top two suspects are
+within 0.1, and show both. On these trials that rule flags 9/13 wrong picks
+and 9/131 right ones. The 0.1 cut was chosen on the same 144 trials (in-sample,
+13 wrong picks), so treat it as a working rule. Two wrong picks had a 0.7 gap:
+the signal does not catch confidently wrong rankings.
+
 ### Retrieval
 
 - Runbook top-1 on cases with an expected runbook: **10/17**; correct runbook
