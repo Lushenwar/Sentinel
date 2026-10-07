@@ -6,4 +6,6 @@ Each file records `sentinel_git_sha`, the commit the run used. Phase 9 was rebas
 those SHAs (`7b4dc90`, `2e1eb8d`, `530b73f`) live on the preserved branch `feat/phase9-rag-eval`, not on
 `main`. Do not delete that branch.
 
+The 2026-10-07 model-comparison runs record `dfd2797`, preserved on branch `feat/model-comparison`; keep it too.
+
 Runs under `aborted/` are kept for the record and are never scored as measurements.
