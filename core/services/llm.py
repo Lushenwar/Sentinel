@@ -5,7 +5,7 @@ import anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = "claude-sonnet-5"
+MODEL = os.getenv("SENTINEL_MODEL", "claude-sonnet-5")
 
 
 @cache
