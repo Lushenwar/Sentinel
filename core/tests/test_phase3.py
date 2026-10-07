@@ -32,6 +32,23 @@ def test_build_incident_card_includes_error_and_top_suspect():
     assert "Database Connection Pool Exhaustion" in text
 
 
+def _with_suspects(*scores):
+    commits = [
+        {"commit_hash": f"c{i}", "confidence_score": s, "rationale": f"r{i}"} for i, s in enumerate(scores)
+    ]
+    return {**_INCIDENT, "diagnostics": {**_INCIDENT["diagnostics"], "suspect_commits": commits}}
+
+
+def test_close_call_card_shows_both_suspects():
+    text = str(build_incident_card(_with_suspects(0.9, 0.8, 0.1)))  # gap 0.1 (float 0.0999..)
+    assert "Close call" in text and "c0" in text and "c1" in text and "c2" not in text
+
+
+def test_clear_lead_card_shows_only_top_suspect():
+    text = str(build_incident_card(_with_suspects(0.9, 0.7)))
+    assert "Close call" not in text and "c0" in text and "c1" not in text
+
+
 def test_post_incident_to_slack_skips_without_webhook_url():
     with patch("core.services.notifier.SLACK_WEBHOOK_URL", None):
         assert post_incident_to_slack(_INCIDENT) is False
