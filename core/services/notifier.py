@@ -4,6 +4,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
+# Raw confidence barely separates right from wrong #1 picks (AUC 0.60 on 144 eval trials); the gap to #2
+# does (AUC 0.86). ponytail: 0.1 was picked on those same trials (13 wrong picks), re-check as data grows.
+CLOSE_CALL_MARGIN = 0.1
+
+
+def is_close_call(commits: list[dict]) -> bool:
+    """Top two suspects within CLOSE_CALL_MARGIN: the #1 pick is not trustworthy on its own."""
+    if len(commits) < 2:
+        return False
+    return round(commits[0]["confidence_score"] - commits[1]["confidence_score"], 2) <= CLOSE_CALL_MARGIN
 
 
 def _fmt_commit(c: dict) -> str:
@@ -49,7 +59,12 @@ def build_incident_card(incident: dict) -> dict:
                 },
             }
         )
-    if commits:
+    if commits and is_close_call(commits):
+        text = ":scales: *Close call: check both suspects.*\n" + "\n".join(
+            f"{i}. " + _fmt_commit(c) for i, c in enumerate(commits[:2], 1)
+        )
+        blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": text}})
+    elif commits:
         blocks.append(
             {
                 "type": "section",
