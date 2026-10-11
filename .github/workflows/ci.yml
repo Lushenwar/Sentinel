@@ -8,9 +8,20 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     env:
-      # tests mock all external boundaries; these only satisfy import-time env lookups
+      # unit tests mock all external boundaries; test_db_integration runs its SQL against the service below
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      SENTINEL_DB_TESTS: "1"
       ANTHROPIC_API_KEY: ci-dummy
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

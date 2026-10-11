@@ -8,42 +8,28 @@ from .services import git_client, llm_analyzer, vector_store, notifier, postmort
 REPO_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Sentinel root
 RUNBOOKS_DIR = os.path.join(REPO_PATH, "sandbox", "runbooks")
 
-# ponytail: in-process sliding-window dedup; per-worker, resets on restart.
-# Move to Postgres/Redis if you run multiple workers or need durability.
+# Open-incident dedup lives in Postgres (a partial unique index on signature). Only the optional burst
+# threshold is in memory. ponytail: per-worker, resets on restart; it is off at the default threshold of 1.
 _DEDUP_WINDOW_S = float(os.getenv("SENTINEL_DEDUP_WINDOW_S", "300"))
 _DEDUP_THRESHOLD = int(os.getenv("SENTINEL_DEDUP_THRESHOLD", "1"))  # Nth hit in window fires
 _recent_alerts: dict[str, list[float]] = defaultdict(list)  # signature -> hit times
 # Pass matched runbook text into commit ranking. Off: Phase 9 A/B found no measurable benefit (ADR-7).
 _RAG_RANKING = os.getenv("SENTINEL_RAG_RANKING", "0") == "1"
-_open_signatures: dict[str, str] = {}  # signature -> live incident_id
+# Triage takes ~15s; an open incident with no diagnostics this old was orphaned by a dead process.
+STUCK_AFTER_S = float(os.getenv("SENTINEL_STUCK_AFTER_S", "300"))
 
 
-def _dedup_gate(signature: str) -> tuple[str, str | None]:
-    """'fire' (open a new incident), 'duplicate' (fold into an active one),
-    or 'suppress' (below the burst threshold)."""
+def _below_burst_threshold(signature: str) -> bool:
     now = time.monotonic()
     hits = _recent_alerts[signature]
     hits[:] = [t for t in hits if t >= now - _DEDUP_WINDOW_S]
     hits.append(now)
-
-    if signature in _open_signatures:
-        return "duplicate", _open_signatures[signature]
-    if len(hits) < _DEDUP_THRESHOLD:
-        return "suppress", None
-    return "fire", None
-
-
-def _clear_signature(signature: str):
-    _open_signatures.pop(signature, None)
+    return len(hits) < _DEDUP_THRESHOLD
 
 
 def handle_alert(alert_data: dict) -> dict:
     signature = alert_data.get("error_signature", "")
-    decision, existing_id = _dedup_gate(signature)
-    if decision == "duplicate":
-        print(f"[dedup] alert folded into active incident {existing_id}")
-        return {"incident_id": existing_id, "status": "duplicate", "suppressed": True}
-    if decision == "suppress":
+    if _below_burst_threshold(signature):
         seen = len(_recent_alerts[signature])
         print(f"[dedup] alert suppressed ({seen}/{_DEDUP_THRESHOLD} in {int(_DEDUP_WINDOW_S)}s window)")
         return {"incident_id": None, "status": "suppressed", "suppressed": True}
@@ -56,10 +42,21 @@ def handle_alert(alert_data: dict) -> dict:
         "diagnostics": None,
         "postmortem_draft_url": None,
     }
-    db.save_incident(incident)
-    _open_signatures[signature] = incident["incident_id"]
-    print(f"[orchestrator] {incident['incident_id']} created -> triggered")
+    incident_id, created = db.open_incident(incident, signature)
+    if not created:
+        print(f"[dedup] alert folded into active incident {incident_id}")
+        return {"incident_id": incident_id, "status": "duplicate", "suppressed": True}
+    print(f"[orchestrator] {incident_id} created -> triggered")
     return incident
+
+
+def recover_stuck_incidents() -> list[str]:
+    """Re-run triage for incidents orphaned mid-triage (crash, restart). Call once at startup."""
+    stuck = db.stuck_incidents(STUCK_AFTER_S)
+    for inc in stuck:
+        print(f"[orchestrator] {inc['id']} orphaned mid-triage -> re-running diagnostics")
+        run_diagnostics(inc["id"], inc["trigger_data"])
+    return [inc["id"] for inc in stuck]
 
 
 def run_diagnostics(incident_id: str, alert_data: dict):
@@ -110,8 +107,7 @@ def run_diagnostics(incident_id: str, alert_data: dict):
 
         db.update_diagnostics(incident_id, diagnostics)
         if degraded_reason:
-            db.update_status(incident_id, "degraded")
-            _clear_signature(alert_data.get("error_signature", ""))  # terminal: stop folding new alerts
+            db.update_status(incident_id, "degraded")  # terminal: leaves the open set, new alerts open anew
             print(f"[orchestrator] {incident_id} -> degraded (terminal)")
         else:
             alert_dt = datetime.fromisoformat(alert_data["timestamp"].replace("Z", "+00:00"))
@@ -126,8 +122,15 @@ def run_diagnostics(incident_id: str, alert_data: dict):
 
     except Exception as e:
         print(f"[orchestrator] {incident_id} diagnostics failed: {e}")
-        db.update_status(incident_id, "triggered")  # revert so it can be retried
-        _clear_signature(alert_data.get("error_signature", ""))  # allow a retry alert through
+        try:  # terminal and visible, rather than an incident left open with nothing in it
+            reason = f"Diagnostics failed — manual investigation required ({e})"
+            db.update_diagnostics(
+                incident_id,
+                {"suspect_commits": [], "matched_runbooks": [], "degraded": True, "degraded_reason": reason},
+            )
+            db.update_status(incident_id, "degraded")
+        except Exception as e2:  # db down too: the row stays open and empty; startup recovery retries it
+            print(f"[orchestrator] {incident_id} could not record the failure ({e2}); left for recovery")
 
 
 def resolve_incident(incident_id: str) -> dict:
@@ -143,10 +146,7 @@ def resolve_incident(incident_id: str) -> dict:
             "trigger and diagnostics data remain on the incident record."
         )
         print(f"[orchestrator] {incident_id} -- postmortem LLM unavailable, degrading: {e}")
-    db.update_postmortem(incident_id, draft)
-    _clear_signature(
-        (incident.get("trigger_data") or {}).get("error_signature", "")
-    )  # resolved: reopen to new alerts
+    db.update_postmortem(incident_id, draft)  # status -> resolved: leaves the open set
     print(f"[orchestrator] {incident_id} -> resolved, postmortem generated")
     print(f"[metrics] {incident_id} resolve_to_postmortem_s={time.monotonic() - t0:.1f}")
     return db.get_incident(incident_id)
