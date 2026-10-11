@@ -10,6 +10,8 @@ import time
 import httpx
 from datetime import datetime, timezone
 
+from sandbox.alert_signing import signed
+
 APP = "http://localhost:8001"
 CORE = "http://localhost:8000/alert"
 ALERT_THRESHOLD_PCT = 20
@@ -53,7 +55,8 @@ async def run(tps: int, duration: int):
                 if last_error.get("traceback"):
                     alert["traceback"] = last_error["traceback"]
                 try:
-                    await client.post(CORE, json=alert, timeout=5.0)
+                    body, headers = signed(alert)
+                    await client.post(CORE, content=body, headers=headers, timeout=5.0)
                     print("\n[load] alert fired -> sentinel core")
                 except Exception as e:
                     print(f"\n[load] core unreachable: {e}")

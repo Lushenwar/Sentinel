@@ -13,6 +13,8 @@ from pathlib import Path
 import click
 import httpx
 
+from sandbox.alert_signing import signed
+
 REPO_ROOT = Path(__file__).parent.parent
 CONFIG = REPO_ROOT / "sandbox" / "app" / "config.json"
 CORE_ALERT = "http://localhost:8000/alert"
@@ -73,7 +75,8 @@ def trigger_bug(bug_type: str):
         alert["traceback"] = tb
     click.echo(f"[chaos] traceback: {'captured from sandbox app' if tb else 'none (app not running?)'}")
     try:
-        r = httpx.post(CORE_ALERT, json=alert, timeout=5.0)
+        body, headers = signed(alert)
+        r = httpx.post(CORE_ALERT, content=body, headers=headers, timeout=5.0)
         data = r.json()
         click.echo(f"[chaos] incident created: {data['incident_id']} (status={data['status']})")
     except Exception as e:
