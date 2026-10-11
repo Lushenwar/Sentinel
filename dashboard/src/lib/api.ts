@@ -26,6 +26,7 @@ export type Trigger = {
   alert_name: string;
   timestamp: string;
   error_signature: string;
+  traceback?: string;
 };
 
 // shape returned by core's db rows (see core/db.py)
