@@ -77,5 +77,53 @@
     "culprit_index": 2,
     "expected_runbook_id": "config_parse_errors",
     "note": "Deployments set overrides JSON-encoded (README), e.g. ORDERS_DB_HOST='\"10.0.4.12\"'; without json.loads the quotes stay in the host name. Not a database or network problem."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "get_order",
+        "row = db.fetch_one(_ORDER_SQL"
+      ],
+      [
+        "app/db.py",
+        "fetch_one",
+        "rows = fetch_all("
+      ],
+      [
+        "app/db.py",
+        "fetch_all",
+        "pool = get_pool()"
+      ],
+      [
+        "app/db.py",
+        "get_pool",
+        "_pool = psycopg2.pool.ThreadedConnectionPool("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/psycopg2/pool.py",
+        161,
+        "__init__",
+        "AbstractConnectionPool.__init__("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/psycopg2/pool.py",
+        59,
+        "__init__",
+        "self._connect()"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/psycopg2/pool.py",
+        63,
+        "_connect",
+        "conn = psycopg2.connect(*self._args, **self._kwargs)"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py",
+        122,
+        "connect",
+        "conn = _connect(dsn, connection_factory=connection_factory, **kwasync)"
+      ]
+    ]
   }
 }

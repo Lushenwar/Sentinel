@@ -68,5 +68,35 @@
     "culprit_index": 2,
     "expected_runbook_id": null,
     "note": "SKUs are upper-case (SKU-10293); the cart now lower-cases them before the stock lookup. quote() leaves 'SKU-10293' unchanged."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/cart.py",
+        "checkout",
+        "return create_order("
+      ],
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "stock = inventory.get_stock_many("
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock_many",
+        "get_stock(sku"
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock",
+        "resp.raise_for_status()"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/httpx/_models.py",
+        763,
+        "raise_for_status",
+        "raise HTTPStatusError(message, request=request, response=self)"
+      ]
+    ]
   }
 }

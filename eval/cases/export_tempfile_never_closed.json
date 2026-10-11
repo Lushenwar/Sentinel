@@ -86,5 +86,20 @@
     "culprit_index": 1,
     "expected_runbook_id": "file_handle_exhaustion",
     "note": "The temp-file rewrite never closes the NamedTemporaryFile, leaking a descriptor per export. The audit log opens a file per order but closes it via the with block."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "audit.record(\"order.created\""
+      ],
+      [
+        "app/audit.py",
+        "record",
+        "with open(AUDIT_LOG"
+      ]
+    ],
+    "error": "OSError: [Errno 24] Too many open files: '/var/log/orders/audit.jsonl'"
   }
 }

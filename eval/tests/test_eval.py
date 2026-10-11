@@ -74,6 +74,11 @@ def test_fixture_commits_land_in_window_in_order(case):
     assert [d["subject"] for d in diffs] == [c["message"] for c in reversed(case["commits"])]
     assert label["culprit_hash"] in {d["commit_hash"] for d in diffs}
     assert all(len(d["diff"]) < 3000 for d in diffs), "diff hit the truncation limit"
+    if case.get("traceback"):  # every app frame resolved to a real line; no answer-announcing words
+        assert alert["traceback"].startswith("Traceback (most recent call last):")
+        assert not _BANNED.search(alert["traceback"]), alert["traceback"]
+    else:
+        assert "traceback" not in alert
 
 
 # ---------- scorer ----------
@@ -123,6 +128,7 @@ _RAG_READY = "runbooks" in inspect.signature(llm_analyzer.rank_suspect_commits).
     "condition",
     [
         "baseline",
+        "traceback",
         pytest.param("rag", marks=pytest.mark.skipif(not _RAG_READY, reason="runbooks param lands in 9E")),
     ],
 )
@@ -145,6 +151,7 @@ def test_no_label_leaks_into_prompt(condition):
             for value in filter(None, leaks):
                 assert value not in prompt, f"{case['id']}: {value!r} leaked into prompt"
             assert "culprit" not in prompt.lower()
+            assert ("<traceback>" in prompt) == (condition == "traceback" and bool(case.get("traceback")))
     assert len(prompts) == len(CASES)
 
 
@@ -163,3 +170,18 @@ def test_run_aborts_after_consecutive_llm_errors(tmp_path):
         run_eval.main(["--condition", "baseline", "--trials", "3", "--out", str(out)])
     res = report.load(out)
     assert len(res["records"]) == run_eval.MAX_CONSECUTIVE_ERRORS and "aborted" in res
+
+
+def test_traceback_groups_prefer_the_run_that_saw_the_trace():
+    base = [{"case_id": "a", "has_traceback": False}, {"case_id": "b", "has_traceback": False}]
+    tb = [
+        {"case_id": "a", "has_traceback": True, "culprit_in_traceback": False},
+        {"case_id": "b", "has_traceback": False},
+        {"case_id": "c", "has_traceback": True, "culprit_in_traceback": True},
+    ]
+    old = [{"case_id": "d"}]  # pre-traceback runs carry no field
+    assert report.traceback_groups(base + tb + old) == {
+        "a": "trace misses culprit file",
+        "b": "no trace",
+        "c": "culprit file in trace",
+    }

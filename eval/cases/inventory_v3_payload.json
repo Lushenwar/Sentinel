@@ -89,5 +89,24 @@
     "culprit_index": 2,
     "expected_runbook_id": "null_field_handling",
     "note": "The response parser still reads ['available'] while the client now calls a different API version; the only change to what the response contains. The other inventory and order commits never touch parsing."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "stock = inventory.get_stock_many("
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock_many",
+        "get_stock(sku"
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock",
+        "resp.json()[\"available\"]"
+      ]
+    ]
   }
 }

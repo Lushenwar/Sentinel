@@ -81,5 +81,29 @@
     "culprit_index": 2,
     "expected_runbook_id": "null_field_handling",
     "note": "Carts saved before the v2 payload only carry unit_price_cents, so .get('price_cents') yields None and qty * None raises inside _line_total. The helper extraction is behaviour-preserving."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/cart.py",
+        "checkout",
+        "return create_order("
+      ],
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "total = sum(_line_total(line)"
+      ],
+      [
+        "app/handlers/orders.py",
+        "<genexpr>",
+        "total = sum(_line_total(line)"
+      ],
+      [
+        "app/handlers/orders.py",
+        "_line_total",
+        "return line[\"qty\"] * line[\"unit_price_cents\"]"
+      ]
+    ]
   }
 }

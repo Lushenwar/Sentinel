@@ -77,5 +77,19 @@
     "culprit_index": 0,
     "expected_runbook_id": "pagination_errors",
     "note": "Dropping the max(1, ...) clamp lets page_size=0 through; the later total_pages line is where it divides, but that line is safe for any page_size >= 1."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "list_orders",
+        "body = paginate("
+      ],
+      [
+        "app/pagination.py",
+        "paginate",
+        "total_pages = -(-len(items) // page_size)"
+      ]
+    ]
   }
 }

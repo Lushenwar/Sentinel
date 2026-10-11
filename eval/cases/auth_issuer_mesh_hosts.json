@@ -85,5 +85,43 @@
     "culprit_index": 4,
     "expected_runbook_id": "auth_failures",
     "note": "Tokens still carry iss=https://auth.internal; the mesh rename changed the expected issuer, not just a transport URL. Leeway affects exp/iat checks and the algorithm list only widens what is accepted."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/auth.py",
+        "current_user_id",
+        "return verify_token("
+      ],
+      [
+        "app/auth.py",
+        "verify_token",
+        "return jwt.decode("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        210,
+        "decode",
+        "decoded = self.decode_complete("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        151,
+        "decode_complete",
+        "self._validate_claims("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        244,
+        "_validate_claims",
+        "self._validate_iss(payload, issuer)"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        330,
+        "_validate_iss",
+        "raise InvalidIssuerError(\"Invalid issuer\")"
+      ]
+    ]
   }
 }

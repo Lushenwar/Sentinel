@@ -82,5 +82,19 @@
     "culprit_index": 3,
     "expected_runbook_id": "dependency_regressions",
     "note": "httpx 0.28 removed the deprecated proxies= argument (replaced by proxy=). The proxy commit was valid against the pinned 0.27.2; the version bump is what broke it."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "<module>",
+        "from app.clients import inventory, payments"
+      ],
+      [
+        "app/clients/payments.py",
+        "<module>",
+        "_http = httpx.Client("
+      ]
+    ]
   }
 }

@@ -77,5 +77,38 @@
     "culprit_index": 0,
     "expected_runbook_id": "dependency_regressions",
     "note": "redis-py 2.x uses lrem(name, value, num); 3.0+ uses lrem(name, count, value). Under 2.10.6 the job payload is sent as the count. A count of -1 is valid in the current argument order."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/worker.py",
+        "run_forever",
+        "_r.lrem(PROCESSING"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/redis/client.py",
+        1418,
+        "lrem",
+        "return self.execute_command('LREM', name, num, value)"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/redis/client.py",
+        673,
+        "execute_command",
+        "return self.parse_response(connection, command_name, **options)"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/redis/client.py",
+        680,
+        "parse_response",
+        "response = connection.read_response()"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/redis/connection.py",
+        629,
+        "read_response",
+        "raise response"
+      ]
+    ]
   }
 }

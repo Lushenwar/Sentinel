@@ -101,5 +101,31 @@
     "culprit_index": 4,
     "expected_runbook_id": "rate_limiting",
     "note": "The cache key now includes a fresh uuid per batch, so the stock cache never hits; a 60s TTL alone can raise lookups at most ~5x over 300s, not 31x."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "stock = inventory.get_stock_many("
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock_many",
+        "get_stock(sku"
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock",
+        "resp.raise_for_status()"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/httpx/_models.py",
+        763,
+        "raise_for_status",
+        "raise HTTPStatusError(message, request=request, response=self)"
+      ]
+    ],
+    "error": "httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://inventory.internal/v2/stock/SKU-30117'"
   }
 }

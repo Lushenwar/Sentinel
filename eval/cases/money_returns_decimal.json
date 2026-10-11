@@ -81,5 +81,39 @@
     "culprit_index": 4,
     "expected_runbook_id": null,
     "note": "money() now returns a Decimal that lands in every order response body. The thousands-separator change still returned a str."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "/usr/local/lib/python3.12/site-packages/starlette/responses.py",
+        181,
+        "render",
+        "return json.dumps("
+      ],
+      [
+        "/usr/local/lib/python3.12/json/__init__.py",
+        238,
+        "dumps",
+        "**kw).encode(obj)"
+      ],
+      [
+        "/usr/local/lib/python3.12/json/encoder.py",
+        200,
+        "encode",
+        "chunks = self.iterencode(o, _one_shot=True)"
+      ],
+      [
+        "/usr/local/lib/python3.12/json/encoder.py",
+        258,
+        "iterencode",
+        "return _iterencode(o, 0)"
+      ],
+      [
+        "/usr/local/lib/python3.12/json/encoder.py",
+        180,
+        "default",
+        "raise TypeError(f'Object of type {o.__class__.__name__} '"
+      ]
+    ]
   }
 }

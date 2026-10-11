@@ -81,5 +81,24 @@
     "culprit_index": 3,
     "expected_runbook_id": null,
     "note": "_ORDER_SQL gained a second placeholder but get_order still passes (order_id,). The list query added a placeholder and its parameter together."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "get_order",
+        "row = db.fetch_one(_ORDER_SQL"
+      ],
+      [
+        "app/db.py",
+        "fetch_one",
+        "rows = fetch_all(sql, params)"
+      ],
+      [
+        "app/db.py",
+        "fetch_all",
+        "cur.execute(sql, params)"
+      ]
+    ]
   }
 }
