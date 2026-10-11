@@ -1,3 +1,4 @@
+import re
 import subprocess
 from datetime import datetime, timedelta
 
@@ -41,6 +42,8 @@ def get_recent_diffs(repo_path: str, alert_ts: str, window_minutes: int = 60) ->
                 "author": author,
                 "timestamp": ts,
                 "subject": subject,
+                # from the full patch, before truncation, so traceback overlap sees every file
+                "files": re.findall(r"^diff --git a/.* b/(.*)$", diff.stdout, flags=re.M),
                 "diff": diff.stdout[:3000],  # ponytail: truncated for LLM context; raise if diffs are large
             }
         )

@@ -13,7 +13,8 @@
         "source": { "type": "string" },
         "alert_name": { "type": "string" },
         "timestamp": { "type": "string", "format": "date-time" },
-        "error_signature": { "type": "string" }
+        "error_signature": { "type": "string" },
+        "traceback": { "type": "string", "description": "Optional stack trace; fed to commit ranking when present" }
       }
     },
     "diagnostics": {

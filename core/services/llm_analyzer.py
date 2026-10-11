@@ -1,4 +1,5 @@
 import os
+import re
 
 import anthropic
 
@@ -25,6 +26,28 @@ def _runbooks_block(runbooks: list[dict] | None) -> str:
         "its diff plausibly produces this error, not because it touches something a runbook mentions. "
         "Runbook root causes are possibilities, not findings.\n\n"
     )
+
+
+# ponytail: keep the newest frames only; recursion traces run to thousands of lines
+_TRACEBACK_MAX_CHARS = 4000
+
+
+def _traceback_block(traceback: str | None) -> str:
+    """'' without a traceback, so an alert that carries none ranks with the baseline prompt."""
+    if not traceback:
+        return ""
+    return (
+        "STACK TRACE (from the alert; frames show where the error surfaced, which is not necessarily "
+        "where it was introduced):\n"
+        f"<traceback>\n{traceback[-_TRACEBACK_MAX_CHARS:]}\n</traceback>\n\n"
+    )
+
+
+def files_in_traceback(commit_files: list[str], traceback: str | None) -> list[str]:
+    """Commit files that appear as a frame in the traceback. Frames carry deploy paths
+    (/srv/app/x.py), commits carry repo paths (x.py), so match on a path-segment suffix."""
+    frames = {p.replace("\\", "/") for p in re.findall(r'File "([^"]+)", line \d+', traceback or "")}
+    return [f for f in commit_files if any(p == f or p.endswith("/" + f) for p in frames)]
 
 
 class LLMUnavailable(Exception):
@@ -61,9 +84,16 @@ def rank_suspect_commits(diffs: list[dict], alert: dict, runbooks: list[dict] | 
     if not diffs:
         return []
 
+    traceback = alert.get("traceback")
+
+    def _overlap_line(c: dict) -> str:
+        hits = files_in_traceback(c.get("files", []), traceback)
+        return f"Touches files in the stack trace: {', '.join(hits)}\n" if hits else ""
+
     commits_block = "\n\n".join(
         f"COMMIT {c['commit_hash']} | {c['author']} | {c['timestamp']}\n"
         f"Subject: {c['subject']}\n"
+        f"{_overlap_line(c)}"
         f"Diff:\n{c['diff']}"
         for c in diffs
     )
@@ -74,6 +104,7 @@ def rank_suspect_commits(diffs: list[dict], alert: dict, runbooks: list[dict] | 
         f"  name: {alert['alert_name']}\n"
         f"  error: {alert['error_signature']}\n"
         f"  time: {alert['timestamp']}\n\n"
+        f"{_traceback_block(traceback)}"
         f"{_runbooks_block(runbooks)}"
         f"RECENT COMMITS:\n{commits_block}\n\n"
         f"Use rank_commits to return every commit with a confidence_score (0=unrelated, 1=certain cause) "
