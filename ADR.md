@@ -145,3 +145,23 @@ depends on two things that could change:
 - **Baseline headroom.** At 90% top-1 there is little left to win. A larger,
   harder or real incident corpus — especially real runbooks written by the
   team that wrote the code — would be the test that could change this decision.
+
+## ADR-8: Stack traces in commit ranking — on whenever the alert has one
+
+**Context.** The alert was one line of error text; Sentinel never used the
+stack trace a real error tracker attaches. A trace says where an error
+surfaced, which is often not where it was introduced, so it could just as
+easily mislead the ranker as help it.
+
+**Decision.** An alert may carry an optional `traceback`. Ranking gets the
+newest 4000 characters of it, and each commit that touches a file named in a
+frame is marked (frames carry deploy paths, so files match on a path-segment
+suffix). The prompt says frames show where the error surfaced, not
+necessarily its cause. Without a trace the prompt is byte-identical to the
+baseline. No flag: having a trace is what switches it on.
+
+**Measured result** (METRICS.md, 2026-10-11): 95.8% top-1 against baselines
+of 90.3% and 91.7%. The gain comes from one case that went from 0/9 to 3/3;
+cases whose trace named only decoy files improved rather than regressed.
+These traces were written to go through decoys wherever the raising call
+was ambiguous, so they are harder than typical traces.

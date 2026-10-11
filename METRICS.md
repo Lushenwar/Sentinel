@@ -227,3 +227,60 @@ false alarms** (in-sample it was 9/13 and 9/131), so it holds. On Haiku 4.5 it
 flags 7/14 wrong but 22/58 right picks, and Haiku's raw confidence is identical
 for right and wrong picks (0.93 / 0.93): the rule is calibrated for Sonnet 5
 and should be re-checked if the model changes.
+
+## Stack traces in commit ranking (2026-10-11)
+
+**Question:** does sending the alert's stack trace to the ranker, and marking
+commits that touch a file named in a frame, improve top-1?
+
+**Answer: yes, by one robust case flip; everything else ties.** Traces are
+used whenever an alert carries one (no flag).
+
+- **Inputs:** eval set v2 unchanged; 20/24 cases gained a trace
+  (`TRACEBACK_SET_VERSION = "v1"`), rendered against the post-commit fixture
+  repo so app frames carry real line numbers. The 4 metric alerts (timeouts,
+  OOM kill, idle queue) carry none, and their prompts are identical to
+  baseline.
+- **Traces were built against the treatment.** Where the raising call is
+  ambiguous (a leak surfaces at whichever `getconn` or `open` runs next), the
+  frames follow a path *not* through the culprit's lines. The culprit's file
+  appears in 13/20 traces; the other 7 name only decoy files or no app files.
+- **Control:** the two existing Sonnet 5 baselines. The baseline prompt is
+  byte-identical to the one they used (golden-prompt test), so no new
+  baseline run was needed. Same model, `claude-sonnet-5`, 3 trials per case.
+
+Reproduce: `python -m eval.report eval/results/baseline_v2_sonnet5_rerun_2026-10-07.json eval/results/traceback_v2_sonnet5_2026-10-11.json`
+
+| Metric | Baseline 10-04 | Baseline 10-07 | Traceback 10-11 |
+|---|---|---|---|
+| Top-1 | 90.3% (65/72) | 91.7% (66/72) | **95.8% (69/72)** |
+| Top-3 | 100% | 100% | 100% |
+| MRR | 0.947 | 0.958 | 0.975 |
+| LLM failures | 0/72 | 0/72 | 0/72 |
+| Ranking latency, median | 5.8s | 6.5s | 6.3s |
+| Input tokens per call, mean | n/a | 3066 | 3352 (+9%) |
+
+**Where the gain comes from.** `httpx_028_drops_proxies` went from **0/3 in
+every earlier Sonnet run (0/9 across baseline, RAG and re-run) to 3/3**. Its
+trace names only the decoy (`payments.py`, where `httpx.Client(proxies=...)`
+raises at import), yet seeing the call fail at construction pointed the model
+at the dependency bump. The other paired differences are single-trial swings
+already seen between the two baselines (`since_filter_naive_cutoff`,
+`page_size_zero_division`, `export_tempfile_never_closed`).
+
+| Group (trials) | Baseline 10-04 | Baseline 10-07 | Traceback |
+|---|---|---|---|
+| Culprit file in trace (39) | 38/39 | 38/39 | 39/39 |
+| Trace misses culprit file (21) | 15/21 | 16/21 | 18/21 |
+| No trace (12) | 12/12 | 12/12 | 12/12 |
+
+A trace that pointed at a decoy did not pull the ranking towards it: that
+group improved too. `export_tempfile_never_closed`, whose trace points at the
+audit-log decoy, stayed at 0/3, where baseline had already put it (0/3 and
+1/3).
+
+**Limitation:** a 4–5 point gain on 24 cases rests on one case. Read it as
+"traces help and did not hurt here", not as a precise effect size.
+
+**Truncation check:** none of the 216 baseline/RAG/re-run trials hit the
+3000-character diff limit, so truncation did not cause any of the misses.
