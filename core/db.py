@@ -27,39 +27,64 @@ def init_schema():
                     created_at   TIMESTAMPTZ DEFAULT NOW(),
                     updated_at   TIMESTAMPTZ DEFAULT NOW()
                 );
-                CREATE TABLE IF NOT EXISTS app_logs (
-                    id          SERIAL PRIMARY KEY,
-                    incident_id TEXT REFERENCES incidents(id),
-                    ts          TIMESTAMPTZ DEFAULT NOW(),
-                    level       TEXT,
-                    message     TEXT,
-                    endpoint    TEXT,
-                    raw         JSONB
-                );
+                -- dedup key. Rows created before this column existed stay NULL and never dedup.
+                ALTER TABLE incidents ADD COLUMN IF NOT EXISTS signature TEXT;
+                -- at most one open incident per error signature, across workers and restarts
+                CREATE UNIQUE INDEX IF NOT EXISTS incidents_one_open_per_signature
+                    ON incidents (signature) WHERE status IN ('triggered', 'triaging');
             """)
     conn.close()
 
 
-def save_incident(incident: dict):
+_OPEN = "status IN ('triggered', 'triaging')"  # must match the partial index predicate
+
+
+def open_incident(incident: dict, signature: str) -> tuple[str, bool]:
+    """Insert the incident unless one is already open for this signature.
+    Returns (incident_id, created); when not created, the id is the open incident's."""
     conn = _conn()
-    with conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO incidents (id, status, trigger_data, diagnostics, postmortem)
-                   VALUES (%s, %s, %s, %s, %s)
-                   ON CONFLICT (id) DO UPDATE SET
-                     status = EXCLUDED.status,
-                     diagnostics = EXCLUDED.diagnostics,
-                     updated_at = NOW()""",
-                (
-                    incident["incident_id"],
-                    incident["status"],
-                    json.dumps(incident["trigger"]),
-                    json.dumps(incident.get("diagnostics")),
-                    incident.get("postmortem_draft_url"),
-                ),
-            )
+    try:
+        for _ in range(3):  # the open incident can close between the conflict and the lookup
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"""INSERT INTO incidents (id, status, trigger_data, signature)
+                            VALUES (%s, %s, %s, %s)
+                            ON CONFLICT (signature) WHERE {_OPEN} DO NOTHING
+                            RETURNING id""",
+                        (
+                            incident["incident_id"],
+                            incident["status"],
+                            json.dumps(incident["trigger"]),
+                            signature,
+                        ),
+                    )
+                    if cur.fetchone():
+                        return incident["incident_id"], True
+                    cur.execute(f"SELECT id FROM incidents WHERE signature = %s AND {_OPEN}", (signature,))
+                    row = cur.fetchone()
+                    if row:
+                        return row[0], False
+        raise RuntimeError(f"could not open or find an incident for signature {signature!r}")
+    finally:
+        conn.close()
+
+
+def stuck_incidents(older_than_s: float) -> list[dict]:
+    """Open incidents with no diagnostics whose last update is older than older_than_s:
+    the process running their triage died."""
+    conn = _conn()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            f"""SELECT id, trigger_data FROM incidents
+                WHERE {_OPEN} AND (diagnostics IS NULL OR diagnostics = 'null'::jsonb)
+                  AND updated_at < NOW() - make_interval(secs => %s)
+                ORDER BY created_at""",
+            (older_than_s,),
+        )
+        rows = cur.fetchall()
     conn.close()
+    return [dict(r) for r in rows]
 
 
 def get_incident(incident_id: str) -> dict | None:

@@ -1,3 +1,4 @@
+import threading
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,8 @@ async def lifespan(app: FastAPI):
     db.init_schema()
     n = vector_store.ingest_runbooks(orchestrator.RUNBOOKS_DIR)
     print(f"[core] runbooks ingested: {n}")
+    # off the startup path: re-triage can take ~15s per orphaned incident
+    threading.Thread(target=orchestrator.recover_stuck_incidents, daemon=True).start()
     yield
 
 
