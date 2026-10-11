@@ -18,6 +18,7 @@ ALERT_MIN_ERRORS = 5
 
 async def run(tps: int, duration: int):
     counts = {"ok": 0, "err": 0}
+    last_error = {}  # most recent 500 body: real signature + traceback for the alert
     alerted = False
     deadline = time.monotonic() + duration
     interval = 1.0 / tps
@@ -28,6 +29,11 @@ async def run(tps: int, duration: int):
             try:
                 r = await client.get(f"{APP}/api/data")
                 counts["err" if r.status_code >= 500 else "ok"] += 1
+                if r.status_code >= 500:
+                    try:
+                        last_error = r.json()
+                    except ValueError:
+                        pass
             except Exception:
                 counts["err"] += 1
 
@@ -41,9 +47,11 @@ async def run(tps: int, duration: int):
                     "source": "load_generator",
                     "alert_name": "HTTP_500_Internal_Server_Error",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "error_signature": "Error rate spike detected",
+                    "error_signature": last_error.get("error", "Error rate spike detected"),
                     "error_rate_pct": round(err_pct, 1),
                 }
+                if last_error.get("traceback"):
+                    alert["traceback"] = last_error["traceback"]
                 try:
                     await client.post(CORE, json=alert, timeout=5.0)
                     print("\n[load] alert fired -> sentinel core")
