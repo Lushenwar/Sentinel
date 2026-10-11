@@ -16,6 +16,9 @@ import httpx
 REPO_ROOT = Path(__file__).parent.parent
 CONFIG = REPO_ROOT / "sandbox" / "app" / "config.json"
 CORE_ALERT = "http://localhost:8000/alert"
+APP = "http://localhost:8001"
+# endpoint that raises for each bug; memory_leak degrades without raising, so it has none
+_PROBES = {"db_failure": ("GET", "/api/data"), "null_pointer": ("POST", "/api/process")}
 
 _ERROR_SIGS = {
     "db_failure": "OperationalError: connection to server at '127.0.0.1' failed: Connection refused",
@@ -31,6 +34,18 @@ def _write_config_and_commit(bug: str | None):
     msg = f"chore: {'inject bug=' + bug if bug else 'resolve bug'} [{datetime.now(timezone.utc).isoformat()}]"
     subprocess.run(["git", "add", str(CONFIG)], cwd=REPO_ROOT, check=True)
     subprocess.run(["git", "commit", "-m", msg], cwd=REPO_ROOT, check=True)
+
+
+def _probe_traceback(bug_type: str) -> str | None:
+    """Hit the sandbox app once so the alert carries the real stack trace, as Sentry would."""
+    if bug_type not in _PROBES:
+        return None
+    method, path = _PROBES[bug_type]
+    try:
+        r = httpx.request(method, APP + path, json={} if method == "POST" else None, timeout=3.0)
+        return r.json().get("traceback") if r.status_code >= 500 else None
+    except (httpx.HTTPError, ValueError):
+        return None
 
 
 @click.group()
@@ -53,6 +68,10 @@ def trigger_bug(bug_type: str):
         "error_signature": _ERROR_SIGS[bug_type],
         "bug_type": bug_type,
     }
+    tb = _probe_traceback(bug_type)
+    if tb:
+        alert["traceback"] = tb
+    click.echo(f"[chaos] traceback: {'captured from sandbox app' if tb else 'none (app not running?)'}")
     try:
         r = httpx.post(CORE_ALERT, json=alert, timeout=5.0)
         data = r.json()

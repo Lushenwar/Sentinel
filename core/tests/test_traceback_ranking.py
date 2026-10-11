@@ -52,3 +52,17 @@ def test_long_traceback_keeps_newest_frames():
     tb = "x" * 10_000 + "\nTypeError: newest"
     block = llm_analyzer._traceback_block(tb)
     assert "TypeError: newest" in block and len(block) < llm_analyzer._TRACEBACK_MAX_CHARS + 200
+
+
+def test_sandbox_app_traceback_matches_its_repo_path():
+    from fastapi.testclient import TestClient
+
+    from sandbox.app import main as sandbox_app
+
+    with patch.object(sandbox_app, "_bug", return_value="db_failure"):
+        r = TestClient(sandbox_app.app, raise_server_exceptions=False).get("/api/data")
+    assert r.status_code == 500 and r.json()["error"].startswith("RuntimeError: OperationalError")
+    tb = r.json()["traceback"]
+    assert llm_analyzer.files_in_traceback(["sandbox/app/main.py", "core/db.py"], tb) == [
+        "sandbox/app/main.py"
+    ]

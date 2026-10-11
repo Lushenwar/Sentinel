@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -44,7 +45,11 @@ async def catch_all(request: Request, exc: Exception):
         "level": "ERROR",
         "message": str(exc),
         "endpoint": request.url.path,
-        "traceback": repr(exc),
+        "traceback": "".join(traceback.format_exception(exc)),
     }
     print(json.dumps(entry))
-    return JSONResponse(status_code=500, content={"error": str(exc)})
+    # ponytail: debug-mode error body (like a Sentry event) so the load generator can forward the trace
+    return JSONResponse(
+        status_code=500,
+        content={"error": f"{type(exc).__name__}: {exc}", "traceback": entry["traceback"]},
+    )
