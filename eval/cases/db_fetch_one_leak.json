@@ -77,5 +77,31 @@
     "culprit_index": 1,
     "expected_runbook_id": "db_failures",
     "note": "fetch_one returns before putconn on every miss (and on any exception), leaking one connection per lookup that finds nothing; a pool of 6 only lowers the ceiling, it cannot be exhausted without a leak."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "list_orders",
+        "rows = db.fetch_all(_LIST_SQL"
+      ],
+      [
+        "app/db.py",
+        "fetch_all",
+        "conn = pool.getconn()"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/psycopg2/pool.py",
+        169,
+        "getconn",
+        "return self._getconn(key)"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/psycopg2/pool.py",
+        93,
+        "_getconn",
+        "raise PoolError(\"connection pool exhausted\")"
+      ]
+    ]
   }
 }

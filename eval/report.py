@@ -110,6 +110,19 @@ def paired(a: list[dict], b: list[dict]) -> list[tuple]:
     return [(cid, *h) for cid, h in sorted(hits.items())]
 
 
+def traceback_groups(records: list[dict]) -> dict[str, str]:
+    """case_id -> traceback group, from whichever run recorded it (pre-traceback runs did not)."""
+    groups = {}
+    for r in records:
+        if r.get("has_traceback"):
+            groups[r["case_id"]] = (
+                "culprit file in trace" if r["culprit_in_traceback"] else "trace misses culprit file"
+            )
+        elif "has_traceback" in r and r["case_id"] not in groups:
+            groups[r["case_id"]] = "no trace"
+    return groups
+
+
 def _fmt_conf(x):
     return f"{x:.2f}" if x is not None else "n/a"
 
@@ -164,6 +177,14 @@ def print_comparison(a: dict, b: dict):
         print(f"  {cid:<34} {ha:>11}/{ta:<3} {hb:>11}/{tb:<3} {mark}")
     ties = len(rows) - wins - losses
     print(f"  {lb} wins {wins}, losses {losses}, ties {ties} (n={len(rows)} cases)")
+
+    groups = traceback_groups(a["records"] + b["records"])
+    if groups:
+        print("\n== By traceback content (does a trace that names only other files mislead?)")
+        for group in ("culprit file in trace", "trace misses culprit file", "no trace"):
+            for label, res in ((la, a), (lb, b)):
+                s = summarize([r for r in res["records"] if groups.get(r["case_id"]) == group])
+                print(f"  {group:<30} {label:<15} top-1 {_pct(s['top1'], s['n'])}, MRR {s['mrr']:.3f}")
 
     print("\n== Null-runbook cases only (does irrelevant context hurt?)")
     for label, res in ((la, a), (lb, b)):

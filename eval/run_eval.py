@@ -26,6 +26,8 @@ MAX_CONSECUTIVE_ERRORS = 5
 
 def run_trial(case: dict, condition: str) -> dict:
     with fixture.build(case) as (repo, alert, label):
+        if condition != "traceback":
+            alert.pop("traceback", None)  # baseline and rag prompts stay byte-identical to Phase 9
         diffs = git_client.get_recent_diffs(repo, alert["timestamp"])
         rag = condition == "rag"
         runbooks = (
@@ -40,6 +42,13 @@ def run_trial(case: dict, condition: str) -> dict:
             "expected_runbook_id": label["expected_runbook_id"],
             "commits_in_window": len(diffs),
             "truncated_diffs": sum(len(d["diff"]) >= 3000 for d in diffs),
+            "has_traceback": "traceback" in alert,
+            "culprit_in_traceback": bool(
+                llm_analyzer.files_in_traceback(
+                    next(d["files"] for d in diffs if d["commit_hash"] == label["culprit_hash"]),
+                    alert.get("traceback"),
+                )
+            ),
             "retrieved_runbooks": [
                 {"id": r["id"], "similarity_score": r["similarity_score"]} for r in runbooks
             ],
@@ -108,7 +117,7 @@ def _git_sha() -> str:
 
 def main(argv=None):
     p = argparse.ArgumentParser()
-    p.add_argument("--condition", choices=["baseline", "rag"], required=True)
+    p.add_argument("--condition", choices=["baseline", "rag", "traceback"], required=True)
     p.add_argument("--trials", type=int, default=config.DEFAULT_TRIALS)
     p.add_argument("--cases", default="*.json", help="glob inside eval/cases")
     p.add_argument("--out", required=True)
@@ -126,6 +135,7 @@ def main(argv=None):
         "condition": args.condition,
         "dry_run": args.dry_run,
         "eval_set_version": config.EVAL_SET_VERSION,
+        "traceback_set_version": config.TRACEBACK_SET_VERSION if args.condition == "traceback" else None,
         "runbook_corpus_version": config.RUNBOOK_CORPUS_VERSION,
         "runbooks_ingested": n_runbooks,
         "runbook_floor": llm_analyzer.RUNBOOK_FLOOR,

@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -69,6 +70,40 @@ def _rmtree(path: str):
     shutil.rmtree(path, onerror=_chmod_retry)
 
 
+APP_ROOT = "/srv/orders"  # deploy path frames carry; repo paths are relative to it
+
+
+def render_traceback(repo: Path, spec: dict, error: str) -> str:
+    """Python-style traceback whose app frames point at real lines of the post-commit repo.
+
+    Frame forms: [repo_file, func, anchor] (line = first line containing anchor after `def func(`, or the
+    file's only line containing it for <module>/<genexpr>), [abs_path, line, func, code] for library frames,
+    or [text] for a literal line such as "[Previous line repeated 996 more times]".
+    """
+    out = ["Traceback (most recent call last):"]
+    for fr in spec["frames"]:
+        if len(fr) == 1:
+            out.append(f"  {fr[0]}")
+            continue
+        if len(fr) == 4:
+            path, line, func, code = fr
+        else:
+            rel, func, anchor = fr
+            lines = (repo / rel).read_text(encoding="utf-8").splitlines()
+            start = next(
+                (i for i, x in enumerate(lines) if re.match(rf"\s*def {re.escape(func)}\(", x)), None
+            )
+            hits = [i for i, x in enumerate(lines) if anchor in x and (start is None or i >= start)]
+            if not hits or (start is None and len(hits) != 1):
+                raise ValueError(
+                    f"{rel}:{func}: anchor must match {'once' if start is None else ''}: {anchor!r}"
+                )
+            path, line, code = f"{APP_ROOT}/{rel}", hits[0] + 1, lines[hits[0]].strip()
+        out += [f'  File "{path}", line {line}, in {func}', f"    {code}"]
+    out.append(spec.get("error", error))
+    return "\n".join(out)
+
+
 @contextmanager
 def build(case: dict):
     """Yields (repo_path, alert, label). label gains culprit_hash for the scorer."""
@@ -101,6 +136,8 @@ def build(case: dict):
             "timestamp": ALERT_TS,
             "error_signature": case["alert"]["error_signature"],
         }
+        if case.get("traceback"):  # only the traceback condition sends it; run_eval strips it otherwise
+            alert["traceback"] = render_traceback(repo, case["traceback"], case["alert"]["error_signature"])
         label = {**case["label"], "culprit_hash": hashes[case["label"]["culprit_index"]]}
         yield str(repo), alert, label
     finally:

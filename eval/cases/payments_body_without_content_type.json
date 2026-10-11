@@ -89,5 +89,25 @@
     "culprit_index": 2,
     "expected_runbook_id": null,
     "note": "httpx sets Content-Type: application/json only for json=; with content= the body is sent untyped. The idempotency header commit leaves the json= body intact."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "payments.charge(order_id, total, card_token)"
+      ],
+      [
+        "app/clients/payments.py",
+        "charge",
+        "resp.raise_for_status()"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/httpx/_models.py",
+        763,
+        "raise_for_status",
+        "raise HTTPStatusError(message, request=request, response=self)"
+      ]
+    ]
   }
 }

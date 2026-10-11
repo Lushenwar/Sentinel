@@ -85,5 +85,14 @@
     "culprit_index": 2,
     "expected_runbook_id": null,
     "note": "The new filter strips tzinfo from the cutoff and compares it with timestamptz rows. The export change only formats a file name and never compares datetimes."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "list_orders",
+        "r[\"created_at\"] >= cutoff"
+      ]
+    ]
   }
 }

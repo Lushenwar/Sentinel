@@ -2,6 +2,10 @@
 RUNBOOK_CORPUS_VERSION = "v1"  # sandbox/runbooks/*.md, 10 docs, frozen at Phase 9B
 # v2 replaced v1 after the v1 baseline hit 100% top-1 (ceiling); v1 lives in git history at d6f6bd1.
 EVAL_SET_VERSION = "v2"  # eval/cases/*.json + eval/bases/, 24 cases, frozen at Phase 9C (rev)
+# Case "traceback" specs, read only by the traceback condition (baseline and rag prompts never see them).
+# Frames follow the real runtime path. Where the raising call is ambiguous (a leak surfaces at any getconn
+# or open), the path NOT through the culprit's lines was chosen, so the culprit file is in 13/20 traces.
+TRACEBACK_SET_VERSION = "v1"  # 20 of 24 cases; the 4 metric alerts (timeouts, OOM, idle queue) have none
 
 ALERT_TS = "2026-09-01T12:00:00+00:00"  # fixed so fixture commit dates are reproducible
 DEFAULT_TRIALS = 3

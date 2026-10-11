@@ -81,5 +81,19 @@
     "culprit_index": 4,
     "expected_runbook_id": "null_field_handling",
     "note": "Guest orders have customer_email NULL; .strip() on None raises. The email_domain commit guards None."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "get_order",
+        "serializers.order_to_dict(row)"
+      ],
+      [
+        "app/serializers.py",
+        "order_to_dict",
+        "row[\"customer_email\"].strip()"
+      ]
+    ]
   }
 }

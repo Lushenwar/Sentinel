@@ -85,5 +85,44 @@
     "culprit_index": 3,
     "expected_runbook_id": "auth_failures",
     "note": "leeway_s is seconds but is now wrapped as milliseconds (45ms), so ~4s of clock skew fails the iat check. Widening leeway_s to 45 would tolerate it; the PyJWT minor bump does not change leeway handling."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/auth.py",
+        "current_user_id",
+        "return verify_token("
+      ],
+      [
+        "app/auth.py",
+        "verify_token",
+        "return jwt.decode("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        210,
+        "decode",
+        "decoded = self.decode_complete("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        151,
+        "decode_complete",
+        "self._validate_claims("
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        244,
+        "_validate_claims",
+        "self._validate_iat(payload, now, leeway)"
+      ],
+      [
+        "/usr/local/lib/python3.12/site-packages/jwt/api_jwt.py",
+        330,
+        "_validate_iat",
+        "raise ImmatureSignatureError(\"The token is not yet valid (iat)\")"
+      ]
+    ],
+    "error": "jwt.exceptions.ImmatureSignatureError: The token is not yet valid (iat)"
   }
 }

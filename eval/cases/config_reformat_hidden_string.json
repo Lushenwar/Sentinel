@@ -72,5 +72,29 @@
     "culprit_index": 1,
     "expected_runbook_id": "config_parse_errors",
     "note": "The one-key-per-line reformat quietly turned cache.max_entries into the string \"5000\"; TTLCache.set compares len(...) >= max_entries. The TTL change keeps an int."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "stock = inventory.get_stock_many("
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock_many",
+        "get_stock(sku"
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock",
+        "_stock_cache.set("
+      ],
+      [
+        "app/cache.py",
+        "set",
+        "if len(self._data) >= self.max_entries"
+      ]
+    ]
   }
 }

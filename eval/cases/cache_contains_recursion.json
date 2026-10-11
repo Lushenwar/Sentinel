@@ -85,5 +85,59 @@
     "culprit_index": 2,
     "expected_runbook_id": null,
     "note": "__contains__ now calls get() and get() starts with 'key not in self', so each calls the other. The earlier __contains__ read _data directly and was fine."
+  },
+  "traceback": {
+    "frames": [
+      [
+        "app/handlers/orders.py",
+        "create_order",
+        "stock = inventory.get_stock_many("
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock_many",
+        "get_stock(sku"
+      ],
+      [
+        "app/clients/inventory.py",
+        "get_stock",
+        "cached = _stock_cache.get("
+      ],
+      [
+        "app/cache.py",
+        "get",
+        "if key not in self"
+      ],
+      [
+        "app/cache.py",
+        "__contains__",
+        "return self.get(key) is not None"
+      ],
+      [
+        "app/cache.py",
+        "get",
+        "if key not in self"
+      ],
+      [
+        "app/cache.py",
+        "__contains__",
+        "return self.get(key) is not None"
+      ],
+      [
+        "app/cache.py",
+        "get",
+        "if key not in self"
+      ],
+      [
+        "app/cache.py",
+        "__contains__",
+        "return self.get(key) is not None"
+      ],
+      [
+        "app/cache.py",
+        "get",
+        "if key not in self"
+      ]
+    ]
   }
 }
