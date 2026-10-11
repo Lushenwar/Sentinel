@@ -48,8 +48,7 @@
         "impact_assessment": {
           "type": "object",
           "properties": {
-            "error_rate_delta_pct": { "type": ["number", "null"] },
-            "estimated_affected_users": { "type": ["integer", "null"] }
+            "error_rate_delta_pct": { "type": ["number", "null"] }
           }
         },
         "degraded": { "type": "boolean" },

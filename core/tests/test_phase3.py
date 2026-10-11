@@ -19,7 +19,7 @@ _INCIDENT = {
         "matched_runbooks": [
             {"title": "Database Connection Pool Exhaustion", "primary_action": "Check pool limits."}
         ],
-        "impact_assessment": {"error_rate_delta_pct": 340.5, "estimated_affected_users": 142},
+        "impact_assessment": {"error_rate_delta_pct": 340.5},
     },
 }
 
