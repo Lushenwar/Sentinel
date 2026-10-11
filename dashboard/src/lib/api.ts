@@ -18,7 +18,7 @@ export type MatchedRunbook = {
 export type Diagnostics = {
   suspect_commits: SuspectCommit[];
   matched_runbooks: MatchedRunbook[];
-  impact_assessment: { error_rate_delta_pct: number | null; estimated_affected_users: number | null };
+  impact_assessment: { error_rate_delta_pct: number | null };
 };
 
 export type Trigger = {

@@ -92,10 +92,9 @@ def run_diagnostics(incident_id: str, alert_data: dict):
             "suspect_commits": ranked,
             # runbook text is prompt-only; never persisted or sent to Slack
             "matched_runbooks": [{k: v for k, v in r.items() if k != "content"} for r in runbooks],
-            "impact_assessment": {
-                "error_rate_delta_pct": alert_data.get("error_rate_pct"),
-                "estimated_affected_users": None,
-            },
+            # no affected-user estimate: nothing upstream reports user ids, and the dashboard
+            # renders no fabricated figures
+            "impact_assessment": {"error_rate_delta_pct": alert_data.get("error_rate_pct")},
         }
         if degraded_reason:
             diagnostics["degraded"] = True

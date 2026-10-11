@@ -46,7 +46,7 @@ Instead of connecting to high-risk production infrastructure, Sentinel operates 
 ### How It Works:
 
 1. **Trigger:** A mock deployment script injects a faulty commit into the sandbox repository, spiking the traffic generator's error rates and triggering a simulated critical alert webhook.
-2. **Diagnose:** Sentinel intercepts the alert, queries local Postgres logs, pulls recent git diffs, ranks suspect commits using Claude Sonnet structured JSON outputs, and fetches matching runbooks using vector similarity.
+2. **Diagnose:** Sentinel intercepts the alert, reads its stack trace, pulls recent git diffs, ranks suspect commits using Claude Sonnet structured JSON outputs, and fetches matching runbooks using vector similarity.
 3. **Communicate:** The system constructs an incredibly concise operational summary and dispatches an asynchronous structured diagnostic card to an active Slack channel via an Incoming Webhook.
 4. **Document:** Upon simulated incident resolution, the orchestration loop synthesizes the entire timeline into an perfectly structured postmortem markdown document ready for human export to Notion/Confluence.
 
@@ -154,8 +154,7 @@ Communication across state machines utilizes strict, structured schemas. The sta
       }
     ],
     "impact_assessment": {
-      "error_rate_delta_pct": 340.5,
-      "estimated_affected_users": 142
+      "error_rate_delta_pct": 340.5
     }
   },
   "postmortem_draft_url": null
