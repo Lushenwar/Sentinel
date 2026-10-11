@@ -48,6 +48,12 @@ export default function IncidentDetail() {
         <h2>Trigger</h2>
         <p>{trigger.alert_name} — {trigger.source} — {new Date(trigger.timestamp).toLocaleString()}</p>
         <pre className="error-sig">{trigger.error_signature}</pre>
+        {trigger.traceback && (
+          <details>
+            <summary>Stack trace</summary>
+            <pre>{trigger.traceback}</pre>
+          </details>
+        )}
       </div>
 
       {diagnostics && (
